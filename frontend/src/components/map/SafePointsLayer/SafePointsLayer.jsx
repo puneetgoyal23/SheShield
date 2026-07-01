@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useEffect, useRef } from 'react';
 import { Marker, Popup, useMap } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
@@ -31,6 +31,37 @@ const createCustomIcon = (type) => {
   });
 };
 
+// Bypass Leaflet's aggressive stopPropagation by binding native DOM events directly to the button
+const NativeButton = ({ onClick, children, className }) => {
+  const ref = useRef(null);
+  
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    
+    const handler = (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      onClick(e);
+    };
+    
+    // Bind touchstart and mousedown to immediately catch the interaction before Leaflet suppresses it
+    el.addEventListener('mousedown', handler);
+    el.addEventListener('touchstart', handler, { passive: false });
+    
+    return () => {
+      el.removeEventListener('mousedown', handler);
+      el.removeEventListener('touchstart', handler);
+    };
+  }, [onClick]);
+  
+  return (
+    <button ref={ref} className={className} type="button">
+      {children}
+    </button>
+  );
+};
+
 const SafePointsLayer = () => {
   const map = useMap();
   const safePoints = useSafetyStore((s) => s.safePoints);
@@ -51,22 +82,36 @@ const SafePointsLayer = () => {
   const handleNavigate = useCallback((point) => {
     map.closePopup();
 
-    // Set origin to current user position
-    if (userPosition) {
-      setOrigin({
-        lat: userPosition[0],
-        lng: userPosition[1],
-        name: 'My Location'
-      });
+    // 1. Verify user position exists to set origin
+    if (!userPosition || userPosition.length !== 2) {
+      console.error('Routing cannot start: Valid userPosition is missing from navigationStore.', userPosition);
+      return;
     }
 
+    // 2. Verify latitude and longitude are valid finite numbers
+    const destLat = parseFloat(point.lat);
+    const destLng = parseFloat(point.lng);
+
+    if (!Number.isFinite(destLat) || !Number.isFinite(destLng)) {
+      console.error('Routing cannot start: Safe Point coordinates are not valid finite numbers.', point);
+      return;
+    }
+
+    // Set origin to current user position
+    setOrigin({
+      lat: userPosition[0],
+      lng: userPosition[1],
+      name: 'My Location'
+    });
+
+    // 3. Normalize every Safe Point into exactly the same destination structure used by destination search
     setDestination({
-      id: point.id,
-      name: point.name,
-      subtitle: point.address,
-      lat: point.lat,
-      lng: point.lng,
-      type: 'safepoint'
+      id: String(point.id),
+      name: String(point.name || 'Safe Point'),
+      subtitle: String(point.address || point.subtitle || 'Safe Point Location'),
+      lat: destLat,
+      lng: destLng,
+      type: point.type || 'place'
     });
 
     setAppMode(APP_MODES.PLANNING);
@@ -91,15 +136,17 @@ const SafePointsLayer = () => {
             popupopen: (e) => {
               // Record exactly when the popup was opened natively by Leaflet
               e.popup._lastOpenTime = Date.now();
+              
+              // Hide bottom sheet when a Safe Point popup is active
+              const currentSheetState = useUiStore.getState().bottomSheetState;
+              if (currentSheetState !== SHEET_STATES.HIDDEN) {
+                setBottomSheet(SHEET_STATES.HIDDEN);
+              }
             },
             click: (e) => {
               const marker = e.target;
               const popup = marker.getPopup();
               if (popup && popup.isOpen()) {
-                // Leaflet naturally opens the popup on marker click before firing this click event.
-                // We compare the current time with the open time.
-                // If it opened just a few milliseconds ago, this click was to OPEN it.
-                // If it opened long ago (> 200ms), this click was to CLOSE (toggle) it.
                 const wasJustOpened = (Date.now() - (popup._lastOpenTime || 0)) < 200;
                 if (!wasJustOpened) {
                   marker.closePopup();
@@ -118,22 +165,13 @@ const SafePointsLayer = () => {
               <p className="sp-type">{point.type.replace('_', ' ').toUpperCase()}</p>
               <p className="sp-distance">{point.distance}m away</p>
 
-              <button
+              <NativeButton
                 className="sp-navigate-btn"
-                onPointerUp={(e) => {
-                  e.stopPropagation();
-                  handleNavigate(point);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.stopPropagation();
-                    handleNavigate(point);
-                  }
-                }}
+                onClick={() => handleNavigate(point)}
               >
                 <Navigation size={14} />
                 Start Navigation
-              </button>
+              </NativeButton>
             </div>
           </Popup>
         </Marker>

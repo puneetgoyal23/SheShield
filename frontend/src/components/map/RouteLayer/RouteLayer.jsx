@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import useRouteStore from '../../../stores/routeStore';
@@ -28,6 +28,7 @@ const RouteLayer = () => {
         const fetchedRoutes = await routingApi.getSafeRoutes(origin, destination);
         setRoutes(fetchedRoutes);
       } catch (err) {
+        console.error('RouteLayer: Routing failed for origin/destination.', { origin, destination, error: err.message });
         setError(err.message || 'Failed to find route');
         setRoutes([]);
       } finally {
@@ -55,6 +56,13 @@ const RouteLayer = () => {
     }
   }, [routes, activeRouteIndex, map]);
 
+  const getRouteColor = (route, isActive) => {
+    if (!isActive) return '#9e9e9e'; // Gray for inactive
+    if (route.type === 'safe') return '#00e5ff'; // Vibrant Cyan
+    if (route.type === 'fast') return '#ff2d95'; // Vibrant Magenta
+    return '#b388ff'; // Vibrant Purple fallback
+  };
+
   if (!routes || routes.length === 0) return null;
 
   // Render inactive routes first (so they are below the active one), then active route
@@ -64,34 +72,61 @@ const RouteLayer = () => {
         if (index === activeRouteIndex) return null; // Skip active route for now
         
         return (
-          <Polyline
-            key={route.id}
-            positions={route.geometry}
-            pathOptions={{
-              color: '#808080',
-              weight: 5,
-              opacity: 0.6,
-              lineCap: 'round',
-              lineJoin: 'round',
-            }}
-          />
+          <React.Fragment key={`inactive_group_${route.id}`}>
+            {/* Inactive Route Outline (Shadow) */}
+            <Polyline
+              positions={route.geometry}
+              pathOptions={{
+                color: '#000000',
+                weight: 9,
+                opacity: 0.6,
+                lineCap: 'round',
+                lineJoin: 'round',
+              }}
+            />
+            {/* Inactive Route Inner */}
+            <Polyline
+              positions={route.geometry}
+              pathOptions={{
+                color: getRouteColor(route, false),
+                weight: 5,
+                opacity: 0.8,
+                lineCap: 'round',
+                lineJoin: 'round',
+              }}
+            />
+          </React.Fragment>
         );
       })}
       
       {/* Active Route */}
       {routes[activeRouteIndex] && (
-        <Polyline
-          key={routes[activeRouteIndex].id + '_active'}
-          positions={routes[activeRouteIndex].geometry}
-          pathOptions={{
-            color: 'var(--color-primary)', // Pink/Magenta primary
-            weight: 7,
-            opacity: 1,
-            lineCap: 'round',
-            lineJoin: 'round',
-            className: 'active-route-path'
-          }}
-        />
+        <React.Fragment key={`active_group_${routes[activeRouteIndex].id}`}>
+          {/* Active Route Outline (Shadow) */}
+          <Polyline
+            positions={routes[activeRouteIndex].geometry}
+            pathOptions={{
+              color: '#000000',
+              weight: 12, // Thicker outline
+              opacity: 0.8,
+              lineCap: 'round',
+              lineJoin: 'round',
+              className: 'active-route-outline'
+            }}
+          />
+          {/* Active Route Inner */}
+          <Polyline
+            positions={routes[activeRouteIndex].geometry}
+            pathOptions={{
+              color: getRouteColor(routes[activeRouteIndex], true),
+              weight: 8, // Thicker 8px bright route
+              opacity: 1,
+              lineCap: 'round',
+              lineJoin: 'round',
+              className: 'active-route-path'
+            }}
+          />
+        </React.Fragment>
       )}
     </>
   );

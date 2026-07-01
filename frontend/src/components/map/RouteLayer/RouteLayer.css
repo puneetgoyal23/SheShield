@@ -1,4 +1,5 @@
-.active-route-path {
+.active-route-path,
+.active-route-outline {
   animation: route-draw 1.5s ease-out forwards;
 }
 
