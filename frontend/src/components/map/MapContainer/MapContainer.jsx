@@ -1,20 +1,10 @@
-/**
- * MapContainer — Leaflet map with dark tiles.
- *
- * Architecture note:
- *   - MapController (inner component) must be a *child* of LeafletMapContainer
- *     to access the useMap() hook.
- *   - MapController stores the map instance in Zustand so other components
- *     (SOS button, search bar) can trigger flyTo() without prop drilling.
- *   - userPosition comes from navigationStore — set once by MapShell on
- *     geolocation resolve.
- */
 import { useEffect } from 'react';
 import { MapContainer as LeafletMapContainer, TileLayer, useMap } from 'react-leaflet';
 import useMapStore        from '../../../stores/mapStore';
 import useNavigationStore from '../../../stores/navigationStore';
 import { ACTIVE_TILE, DEFAULT_CENTER, DEFAULT_ZOOM, NAVIGATION_ZOOM } from '../../../constants/mapConstants';
 import UserLocationPin from '../UserLocationPin/UserLocationPin';
+import RouteLayer from '../RouteLayer/RouteLayer';
 import './MapContainer.css';
 
 /* ── Inner: registers the map instance in Zustand ── */
@@ -63,7 +53,8 @@ const MapContainer = () => {
 
         <MapController />
 
-        {/* Phase 2: RouteLayer goes here */}
+        <RouteLayer />
+        
         {/* Phase 3: HeatMapLayer, SafePointMarkers go here */}
 
         <UserLocationPin position={userPosition} />

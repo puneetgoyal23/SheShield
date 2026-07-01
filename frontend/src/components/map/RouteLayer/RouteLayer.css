@@ -1,0 +1,14 @@
+.active-route-path {
+  animation: route-draw 1.5s ease-out forwards;
+}
+
+@keyframes route-draw {
+  from {
+    stroke-dasharray: 2000;
+    stroke-dashoffset: 2000;
+  }
+  to {
+    stroke-dasharray: 2000;
+    stroke-dashoffset: 0;
+  }
+}

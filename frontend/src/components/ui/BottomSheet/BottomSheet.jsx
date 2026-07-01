@@ -1,15 +1,8 @@
-/**
- * BottomSheet — Glass bottom panel with time-of-day safety context.
- *
- * Phase 1: Empty state with quick-action chips and time badge.
- * Phase 2: Will contain RouteCards and RouteSelector.
- * Phase 3: Will add SafePointPanel.
- *
- * The component accepts `children` so Phase 2 can inject content
- * without modifying this file.
- */
 import { Shield } from 'lucide-react';
 import { getTimeSlot, getTimeSafetyLevel } from '../../../utils/timeOfDay';
+import useUiStore from '../../../stores/uiStore';
+import { APP_MODES } from '../../../constants/appConstants';
+import RouteCards from '../../route/RouteCards/RouteCards';
 import './BottomSheet.css';
 
 /* ── Time of Day Safety Badge ── */
@@ -69,6 +62,8 @@ const EmptyState = () => (
 
 /* ── Main BottomSheet ── */
 const BottomSheet = ({ children }) => {
+  const appMode = useUiStore((s) => s.appMode);
+  
   return (
     <div className="bottom-sheet anim-slide-up" role="complementary" aria-label="Route panel">
 
@@ -79,7 +74,11 @@ const BottomSheet = ({ children }) => {
 
       {/* Content */}
       <div className="bs-content">
-        {children ?? <EmptyState />}
+        {appMode === APP_MODES.PLANNING ? (
+          <RouteCards />
+        ) : (
+          children ?? <EmptyState />
+        )}
       </div>
 
     </div>

@@ -1,0 +1,71 @@
+.search-suggestions-dropdown {
+  position: absolute;
+  top: calc(100% + var(--sp-2));
+  left: 0;
+  right: 0;
+  background: var(--glass-bg-heavy);
+  backdrop-filter: var(--glass-blur-heavy);
+  -webkit-backdrop-filter: var(--glass-blur-heavy);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-lg);
+  padding: var(--sp-2) 0;
+  margin: 0;
+  list-style: none;
+  z-index: var(--z-modal);
+  animation: anim-slide-down var(--transition-fast) both;
+  overflow: hidden;
+}
+
+.search-suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.search-suggestion-item.loading {
+  justify-content: center;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  cursor: default;
+}
+
+.search-suggestion-item:hover,
+.search-suggestion-item.active {
+  background: var(--color-surface-raised);
+}
+
+.search-suggestion-icon {
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.search-suggestion-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.search-suggestion-name {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-suggestion-subtitle {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
