@@ -15,6 +15,8 @@ import SOSButton       from '../../sos/SOSButton/SOSButton';
 import BottomSheet     from '../../ui/BottomSheet/BottomSheet';
 import MapControls     from '../../ui/MapControls/MapControls';
 import MapLayerControls from '../../ui/MapLayerControls/MapLayerControls';
+import AlertMode       from '../../alert/AlertMode/AlertMode';
+import AlertModal      from '../../alert/AlertModal/AlertModal';
 
 import useGeolocation    from '../../../hooks/useGeolocation';
 import useNavigationStore from '../../../stores/navigationStore';
@@ -96,6 +98,11 @@ const MapShell = () => {
         <MapControls />
       </div>
 
+      {/* ── Layer 2.5: Alert Mode (z-index: 900) ── */}
+      <div className="layer layer--alert">
+        <AlertMode />
+      </div>
+
       {/* ── Layer 3: SOS FAB (z-index: 999) ── */}
       <div className="layer layer--sos">
         <SOSButton />
@@ -105,6 +112,9 @@ const MapShell = () => {
       <div className="layer layer--bottom">
         <BottomSheet />
       </div>
+
+      {/* ── Modals ── */}
+      <AlertModal />
 
     </div>
   );

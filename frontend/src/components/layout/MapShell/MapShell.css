@@ -95,6 +95,14 @@
   animation: anim-scale-in-spring 0.5s 0.4s both;
 }
 
+/* ══ Layer 2.5: Alert Mode ══ */
+.layer--alert {
+  right: var(--sp-4);
+  bottom: 520px;  /* above zoom controls */
+  z-index: 900;
+  pointer-events: all;
+}
+
 /* ══ Layer 4: Bottom Sheet ══ */
 .layer--bottom {
   left: 0;
@@ -117,6 +125,11 @@
   .layer--controls {
     right: var(--sp-6);
     bottom: 240px;
+  }
+  
+  .layer--alert {
+    right: var(--sp-6);
+    bottom: 540px;
   }
 
   .layer--sos {
