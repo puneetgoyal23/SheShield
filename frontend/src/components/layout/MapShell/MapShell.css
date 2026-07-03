@@ -103,6 +103,14 @@
   pointer-events: all;
 }
 
+/* ══ Layer 2.8: Report Incident ══ */
+.layer--report {
+  right: var(--sp-4);
+  bottom: 580px;  /* above alert mode */
+  z-index: 910;
+  pointer-events: all;
+}
+
 /* ══ Layer 4: Bottom Sheet ══ */
 .layer--bottom {
   left: 0;
@@ -130,6 +138,11 @@
   .layer--alert {
     right: var(--sp-6);
     bottom: 540px;
+  }
+
+  .layer--report {
+    right: var(--sp-6);
+    bottom: 600px;
   }
 
   .layer--sos {

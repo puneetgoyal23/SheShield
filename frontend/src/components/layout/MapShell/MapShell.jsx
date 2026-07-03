@@ -17,6 +17,8 @@ import MapControls     from '../../ui/MapControls/MapControls';
 import MapLayerControls from '../../ui/MapLayerControls/MapLayerControls';
 import AlertMode       from '../../alert/AlertMode/AlertMode';
 import AlertModal      from '../../alert/AlertModal/AlertModal';
+import ReportButton    from '../../report/ReportButton/ReportButton';
+import ReportModal     from '../../report/ReportModal/ReportModal';
 
 import useGeolocation    from '../../../hooks/useGeolocation';
 import useNavigationStore from '../../../stores/navigationStore';
@@ -103,6 +105,11 @@ const MapShell = () => {
         <AlertMode />
       </div>
 
+      {/* ── Layer 2.8: Report Incident (z-index: 910) ── */}
+      <div className="layer layer--report">
+        <ReportButton />
+      </div>
+
       {/* ── Layer 3: SOS FAB (z-index: 999) ── */}
       <div className="layer layer--sos">
         <SOSButton />
@@ -115,6 +122,7 @@ const MapShell = () => {
 
       {/* ── Modals ── */}
       <AlertModal />
+      <ReportModal />
 
     </div>
   );
