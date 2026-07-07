@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import useRouteStore from '../../../stores/routeStore';
+import useUiStore from '../../../stores/uiStore';
 import { routingApi } from '../../../services/api/routingApi';
 import './RouteLayer.css';
 
@@ -15,6 +16,9 @@ const RouteLayer = () => {
   const setRoutes = useRouteStore((s) => s.setRoutes);
   const setLoading = useRouteStore((s) => s.setLoading);
   const setError = useRouteStore((s) => s.setError);
+  const setActiveRoute = useRouteStore((s) => s.setActiveRoute);
+  
+  const pushToast = useUiStore((s) => s.pushToast);
 
   // Fetch routes when origin and destination change
   useEffect(() => {
@@ -27,6 +31,13 @@ const RouteLayer = () => {
       try {
         const fetchedRoutes = await routingApi.getSafeRoutes(origin, destination);
         setRoutes(fetchedRoutes);
+        
+        if (fetchedRoutes.length > 0 && fetchedRoutes[0].isMock) {
+          pushToast({ 
+            type: 'info', 
+            message: 'Development Mode: Displaying simulated route geometries.' 
+          });
+        }
       } catch (err) {
         console.error('RouteLayer: Routing failed for origin/destination.', { origin, destination, error: err.message });
         setError(err.message || 'Failed to find route');
@@ -76,6 +87,7 @@ const RouteLayer = () => {
             {/* Inactive Route Outline (Shadow) */}
             <Polyline
               positions={route.geometry}
+              eventHandlers={{ click: () => setActiveRoute(index) }}
               pathOptions={{
                 color: '#000000',
                 weight: 9,
@@ -87,6 +99,7 @@ const RouteLayer = () => {
             {/* Inactive Route Inner */}
             <Polyline
               positions={route.geometry}
+              eventHandlers={{ click: () => setActiveRoute(index) }}
               pathOptions={{
                 color: getRouteColor(route, false),
                 weight: 5,

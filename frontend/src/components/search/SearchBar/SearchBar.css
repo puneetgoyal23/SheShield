@@ -40,15 +40,15 @@
   display: flex;
   align-items: center;
   gap: var(--sp-2);
-  padding: 0 52px 0 var(--sp-4); /* Add space on right for Swap Button */
-  height: 50px;
+  padding: 0 44px 0 var(--sp-3); /* Smaller padding on left, enough for swap button on right */
+  height: 44px; /* Reduced from 50px */
 }
 
 /* ── Horizontal Divider ── */
 .search-divider-horizontal {
   height: 1px;
   background: var(--glass-border-strong);
-  margin: 0 var(--sp-4) 0 44px; /* Align with input text, skipping the icon */
+  margin: 0 var(--sp-3) 0 36px; /* Align with input text, skipping the icon */
 }
 
 /* ── Search Icon ── */

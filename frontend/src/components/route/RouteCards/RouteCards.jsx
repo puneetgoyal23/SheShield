@@ -1,13 +1,16 @@
+import { useState } from 'react';
 import { formatDistance, formatDuration } from '../../../utils/formatters';
 import useRouteStore from '../../../stores/routeStore';
 import useUiStore from '../../../stores/uiStore';
 import useNavigationStore from '../../../stores/navigationStore';
 import { APP_MODES, SHEET_STATES } from '../../../constants/appConstants';
-import { ShieldAlert, ShieldCheck, Shield } from 'lucide-react';
+import { ShieldAlert, ShieldCheck, Shield, ChevronDown, ChevronUp } from 'lucide-react';
 import axiosInstance from '../../../services/api/axiosInstance';
 import './RouteCards.css';
 
-const RouteCard = ({ route, isActive, onClick, onStartNavigation }) => {
+const RouteCard = ({ route, isActive, isExpanded, onToggleExpand, onClick, onStartNavigation }) => {
+  const [isSafetyExpanded, setIsSafetyExpanded] = useState(false);
+
   const isSafe = route.safetyScore >= 80;
   const isWarning = route.safetyScore >= 60 && route.safetyScore < 80;
   
@@ -16,7 +19,7 @@ const RouteCard = ({ route, isActive, onClick, onStartNavigation }) => {
 
   return (
     <div 
-      className={`route-card ${isActive ? 'active' : ''}`}
+      className={`route-card ${isActive ? 'active' : ''} ${isExpanded ? 'expanded' : 'collapsed'}`}
       onClick={onClick}
       role="button"
       tabIndex={0}
@@ -27,38 +30,73 @@ const RouteCard = ({ route, isActive, onClick, onStartNavigation }) => {
         }
       }}
     >
+      {/* COMPACT SUMMARY ROW */}
       <div className="route-card-header">
         <div className="route-card-title">
           <span className="route-card-label">{route.label}</span>
-          <span className="route-card-time">{formatDuration(route.duration)}</span>
+          <div className="route-card-metrics">
+            <span className="route-card-time-compact">{formatDuration(route.duration)}</span>
+            <span className="route-card-dot">•</span>
+            <span className="route-card-subtitle">{formatDistance(route.distance)}</span>
+          </div>
         </div>
-        <div className="route-card-subtitle">
-          {formatDistance(route.distance)}
+        
+        <div className="route-card-actions">
+          <div className={`route-card-mini-score ${scoreClass}`}>
+            <Icon size={14} />
+            <span>{route.safetyScore}</span>
+          </div>
+          <button 
+            className="route-card-chevron" 
+            onClick={onToggleExpand}
+            aria-label={isExpanded ? "Collapse route details" : "Expand route details"}
+          >
+            {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          </button>
         </div>
       </div>
 
-      <div className={`route-card-safety ${scoreClass}`}>
-        <div className="route-card-score-badge">
-          <Icon size={16} />
-          <span>{route.safetyScore}/100 Safety</span>
+      {/* EXPANDED DETAILS */}
+      {isExpanded && (
+        <div className="route-card-expanded-content">
+          <div className={`route-card-safety-container ${scoreClass}`}>
+            <div className="route-card-safety-header">
+              <div className="route-card-score-badge">
+                <Icon size={16} />
+                <span>{route.safetyScore}/100 Safety</span>
+                <span className="route-card-risk">({route.riskLevel || 'Unknown'})</span>
+              </div>
+              {route.warnings && route.warnings.length > 0 && (
+                <button className="route-card-expand-btn" onClick={(e) => {
+                  e.stopPropagation();
+                  setIsSafetyExpanded(!isSafetyExpanded);
+                }}>
+                  <span>{isSafetyExpanded ? 'Hide' : 'Why this score?'}</span>
+                  {isSafetyExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                </button>
+              )}
+            </div>
+            {isSafetyExpanded && route.warnings && route.warnings.length > 0 && (
+              <div className="route-card-safety-details">
+                <ul className="route-card-warnings">
+                  {route.warnings.map((w, i) => <li key={i}>{w}</li>)}
+                </ul>
+              </div>
+            )}
+          </div>
+          
+          {isActive && (
+            <button 
+              className="route-start-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onStartNavigation) onStartNavigation();
+              }}
+            >
+              Start Navigation
+            </button>
+          )}
         </div>
-        {route.warnings && route.warnings.length > 0 && (
-          <ul className="route-card-warnings">
-            {route.warnings.map((w, i) => <li key={i}>{w}</li>)}
-          </ul>
-        )}
-      </div>
-      
-      {isActive && (
-        <button 
-          className="route-start-btn"
-          onClick={(e) => {
-            e.stopPropagation();
-            if (onStartNavigation) onStartNavigation();
-          }}
-        >
-          Start Navigation
-        </button>
       )}
     </div>
   );
@@ -75,6 +113,8 @@ const RouteCards = () => {
 
   const setAppMode = useUiStore((s) => s.setAppMode);
   const setBottomSheet = useUiStore((s) => s.setBottomSheet);
+
+  const [expandedIndex, setExpandedIndex] = useState(0);
 
   const setActiveJourneyId = useNavigationStore((s) => s.setActiveJourneyId);
 
@@ -131,6 +171,11 @@ const RouteCards = () => {
           key={route.id}
           route={route}
           isActive={index === activeRouteIndex}
+          isExpanded={index === expandedIndex}
+          onToggleExpand={(e) => {
+            e.stopPropagation();
+            setExpandedIndex(expandedIndex === index ? null : index);
+          }}
           onClick={() => setActiveRoute(index)}
           onStartNavigation={handleStartNavigation}
         />

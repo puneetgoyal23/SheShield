@@ -8,6 +8,7 @@
  *   3. Remains a pure layout component — no business logic here.
  */
 import { useEffect } from 'react';
+import L from 'leaflet';
 
 import MapContainer    from '../../map/MapContainer/MapContainer';
 import SearchBar       from '../../search/SearchBar/SearchBar';
@@ -58,20 +59,27 @@ const MapShell = () => {
       try {
         const params = { latitude: position.lat, longitude: position.lng, radius: 5000 };
 
-        const [heatmapRes, pointsRes, incidentsRes] = await Promise.all([
-          axiosInstance.get('/heatmap'),
+        // 1. Fetch heatmap data independently so errors here don't block other layers
+        let heatmap = [];
+        try {
+          const heatmapRes = await axiosInstance.get('/heatmap');
+          heatmap = (heatmapRes.data?.points || []).map((p) => [
+            p.latitude,
+            p.longitude,
+            p.weight / 5,
+          ]);
+        } catch (heatmapError) {
+          console.error('Failed to fetch heatmap data', heatmapError);
+        }
+        setHeatMapData(heatmap);
+
+        // 2. Fetch other safety data
+        const [pointsRes, incidentsRes] = await Promise.all([
           axiosInstance.get('/safe-points', { params }),
           axiosInstance.get('/incidents', { params }),
         ]);
 
-        // Transform heatmap: backend returns { latitude, longitude, weight 1-5 }
-        // leaflet.heat expects [lat, lng, intensity 0-1]
-        const heatmap = (heatmapRes.data?.points || []).map((p) => [
-          p.latitude,
-          p.longitude,
-          p.weight / 5,
-        ]);
-        setHeatMapData(heatmap);
+        // Normalization moved out since it's already extracted above
 
         // Normalize safe points: backend category string → frontend type id
         const CATEGORY_TO_TYPE = {
@@ -85,14 +93,22 @@ const MapShell = () => {
           'Bus Terminal':      'bus_stand',
           'Women Help Centre': 'womens_desk',
         };
-        const points = (pointsRes.data?.safePoints || []).map((p) => ({
-          ...p,
-          id:       p._id,
-          type:     CATEGORY_TO_TYPE[p.category] || 'hotel',
-          lat:      p.latitude,
-          lng:      p.longitude,
-          isOpen24h: p.openStatus?.toLowerCase().includes('24'),
-        }));
+        const userLatLng = L.latLng(position.lat, position.lng);
+        const points = (pointsRes.data?.safePoints || []).map((p) => {
+          const pLat = parseFloat(p.latitude);
+          const pLng = parseFloat(p.longitude);
+          const distance = Math.round(userLatLng.distanceTo(L.latLng(pLat, pLng)));
+          
+          return {
+            ...p,
+            id:       p._id,
+            type:     CATEGORY_TO_TYPE[p.category] || 'hotel',
+            lat:      pLat,
+            lng:      pLng,
+            isOpen24h: p.openStatus?.toLowerCase().includes('24'),
+            distance: distance
+          };
+        });
         setSafePoints(points);
 
         // Normalize incidents to match the frontend reportStore shape

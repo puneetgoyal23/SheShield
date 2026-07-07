@@ -28,6 +28,7 @@ const useSafetyStore = create((set) => ({
   /* ── Layer Toggles ── */
   toggleHeatmap: () => set((s) => ({ isHeatmapVisible: !s.isHeatmapVisible })),
   toggleSafePoints: () => set((s) => ({ isSafePointsVisible: !s.isSafePointsVisible })),
+  setSafePointsVisible: (v) => set({ isSafePointsVisible: v }),
 
   /* ── Filter ── */
   setFilter: (filter) => set({ activeFilter: filter }),

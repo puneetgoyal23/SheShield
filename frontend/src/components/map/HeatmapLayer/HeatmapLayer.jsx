@@ -1,6 +1,11 @@
 import { useEffect, useRef, useMemo } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
+
+// Explicitly bind L to window for leaflet.heat to attach correctly in Vite ESM builds
+if (typeof window !== 'undefined') {
+  window.L = L;
+}
 import 'leaflet.heat';
 import useSafetyStore from '../../../stores/safetyStore';
 import useReportStore from '../../../stores/reportStore';
@@ -47,8 +52,9 @@ const HeatmapLayer = () => {
     const blur = timeSlot.id === 'night' ? 25 : 15;
     
     // Customize gradient to blend with dark map
+    // Customize gradient to blend with dark map but remain visible
     const gradient = {
-      0.2: 'rgba(0, 0, 255, 0)',
+      0.2: 'blue',
       0.4: 'cyan',
       0.6: 'lime',
       0.8: 'yellow',
@@ -64,7 +70,7 @@ const HeatmapLayer = () => {
       blur,
       maxZoom: 15,
       gradient,
-      minOpacity: 0.3
+      minOpacity: 0.5
     }).addTo(map);
 
     return () => {

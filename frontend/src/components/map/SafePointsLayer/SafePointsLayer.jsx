@@ -118,6 +118,23 @@ const SafePointsLayer = () => {
     setBottomSheet(SHEET_STATES.HALF);
   }, [map, userPosition, setOrigin, setDestination, setAppMode, setBottomSheet]);
 
+  // Auto-adjust map bounds when points are filtered
+  useEffect(() => {
+    if (isSafePointsVisible && filteredPoints.length > 0 && userPosition) {
+      const bounds = L.latLngBounds([userPosition]);
+      filteredPoints.forEach(p => bounds.extend([p.lat, p.lng]));
+      
+      // Ensure the bounds aren't a single point (if no safe points found somehow)
+      if (bounds.isValid()) {
+        map.fitBounds(bounds, {
+          padding: [50, 50],
+          maxZoom: 15,
+          animate: true
+        });
+      }
+    }
+  }, [isSafePointsVisible, filteredPoints, userPosition, map]);
+
   if (!isSafePointsVisible || !filteredPoints || filteredPoints.length === 0) return null;
 
   return (

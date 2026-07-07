@@ -106,6 +106,7 @@ export const routingApi = {
           geometry,
           // Backend returns safetyExplanation; map to warnings for existing RouteCards
           warnings:     route.safetyExplanation || [],
+          isMock:       route.isMock || false,
         };
       });
     } catch (error) {
