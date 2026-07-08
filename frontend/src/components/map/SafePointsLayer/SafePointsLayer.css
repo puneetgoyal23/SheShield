@@ -104,23 +104,54 @@
 }
 
 .safe-point-popup-content h3 {
-  margin: 0;
   font-size: var(--text-base);
   font-weight: var(--weight-bold);
   color: var(--color-text-primary);
+  margin: 0 0 var(--sp-1) 0;
+  line-height: var(--leading-tight);
+}
+
+.sp-header-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: 0 0 var(--sp-1) 0;
 }
 
 .sp-type {
-  margin: 0;
   font-size: var(--text-xs);
-  color: var(--color-primary);
   font-weight: var(--weight-bold);
+  color: var(--color-primary);
+  margin: 0;
+}
+
+.sp-badge-24h {
+  font-size: 10px;
+  font-weight: var(--weight-bold);
+  background: var(--color-safe-alpha);
+  color: var(--color-safe);
+  padding: 2px 6px;
+  border-radius: var(--r-sm);
+  border: 1px solid rgba(0, 230, 118, 0.25);
+  white-space: nowrap;
 }
 
 .sp-distance {
-  margin: 0;
   font-size: var(--text-sm);
   color: var(--color-text-secondary);
+  font-weight: var(--weight-medium);
+  margin: 0 0 var(--sp-2) 0;
+}
+
+.sp-address {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  line-height: var(--leading-snug);
+  margin: 0 0 var(--sp-3) 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .sp-navigate-btn {

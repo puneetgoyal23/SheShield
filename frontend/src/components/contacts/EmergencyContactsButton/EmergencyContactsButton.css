@@ -1,0 +1,28 @@
+.emergency-contacts-btn {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--color-text-primary);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-left: 8px; /* Spacing from SearchBar */
+}
+
+.emergency-contacts-btn:hover {
+  background: var(--color-surface-raised);
+  transform: translateY(-2px);
+  color: var(--color-primary);
+  border-color: rgba(233, 30, 140, 0.3);
+}
+
+.emergency-contacts-btn:active {
+  transform: translateY(0);
+}

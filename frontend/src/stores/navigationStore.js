@@ -15,6 +15,8 @@ const useNavigationStore = create((set, get) => ({
   remainingTime:     0,      /* seconds                  */
   hasDeviated:       false,
   deviationDistance: 0,      /* meters off-route         */
+  deviationAlert:    null,   /* backend deviation object */
+  isDestinationReached: false,
   activeJourneyId:   null,   /* backend Journey._id      */
 
   /* ── Position ── */
@@ -39,6 +41,8 @@ const useNavigationStore = create((set, get) => ({
       currentStepIndex: 0,
       hasDeviated:      false,
       deviationDistance:0,
+      deviationAlert:   null,
+      isDestinationReached: false,
       activeJourneyId:  null,
     }),
 
@@ -51,11 +55,22 @@ const useNavigationStore = create((set, get) => ({
     set({ remainingDistance: distance, remainingTime: time }),
 
   /* ── Deviation ── */
+  /* ── Deviation & Progress ── */
+  setDeviationAlert: (alert) =>
+    set({
+      hasDeviated: !!alert,
+      deviationAlert: alert,
+      deviationDistance: alert ? alert.distance : 0,
+    }),
+
+  setIsDestinationReached: (reached) =>
+    set({ isDestinationReached: reached }),
+
   triggerDeviation: (distance) =>
     set({ hasDeviated: true, deviationDistance: distance }),
 
   clearDeviation: () =>
-    set({ hasDeviated: false, deviationDistance: 0 }),
+    set({ hasDeviated: false, deviationDistance: 0, deviationAlert: null }),
 }));
 
 export default useNavigationStore;

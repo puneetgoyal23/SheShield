@@ -13,6 +13,7 @@ const useSafetyStore = create((set) => ({
   lastHeatMapUpdate:    null,
   isLoadingHeatMap:     false,
   isLoadingSafePoints:  false,
+  safePointsError:      null,
   isHeatmapVisible:     true,
   isSafePointsVisible:  true,
 
@@ -22,8 +23,9 @@ const useSafetyStore = create((set) => ({
   setLoadingHeatMap: (v) => set({ isLoadingHeatMap: v }),
 
   /* ── Safe Points ── */
-  setSafePoints:       (points) => set({ safePoints: points, isLoadingSafePoints: false }),
-  setLoadingSafePoints:(v)      => set({ isLoadingSafePoints: v }),
+  setSafePoints:       (points) => set({ safePoints: points, isLoadingSafePoints: false, safePointsError: null }),
+  setLoadingSafePoints:(v)      => set({ isLoadingSafePoints: v, safePointsError: v ? null : undefined }), // Reset error on load start
+  setSafePointsError:  (err)    => set({ safePointsError: err, isLoadingSafePoints: false }),
 
   /* ── Layer Toggles ── */
   toggleHeatmap: () => set((s) => ({ isHeatmapVisible: !s.isHeatmapVisible })),

@@ -64,6 +64,16 @@
   text-overflow: ellipsis;
 }
 
+.journey-dest-reached {
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
+  margin-top: var(--sp-1);
+}
+
+.text-safe {
+  color: var(--color-safe);
+}
+
 /* ── Inline Metrics ── */
 .journey-metrics-inline {
   display: flex;
@@ -148,6 +158,17 @@
   border: 1px solid var(--color-danger-alpha);
   cursor: pointer;
   transition: all var(--transition-fast);
+}
+
+.journey-end-btn.bg-safe {
+  background: var(--color-safe);
+  color: #000;
+  border: none;
+}
+
+.journey-end-btn.bg-safe:hover {
+  background: #00c853;
+  transform: scale(1.02);
 }
 
 /* ── Find Nearby Safe Point button ── */

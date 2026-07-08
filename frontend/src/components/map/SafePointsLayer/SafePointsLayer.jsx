@@ -179,8 +179,12 @@ const SafePointsLayer = () => {
           >
             <div className="safe-point-popup-content">
               <h3>{point.name}</h3>
-              <p className="sp-type">{point.type.replace('_', ' ').toUpperCase()}</p>
+              <div className="sp-header-row">
+                <p className="sp-type">{point.type.replace('_', ' ').toUpperCase()}</p>
+                {point.isOpen24h && <span className="sp-badge-24h">24/7 Open</span>}
+              </div>
               <p className="sp-distance">{point.distance}m away</p>
+              {point.address && <p className="sp-address">{point.address}</p>}
 
               <NativeButton
                 className="sp-navigate-btn"

@@ -30,6 +30,7 @@ const ActiveJourneyPanel = () => {
   const remainingDistance = useNavigationStore((s) => s.remainingDistance);
   const remainingTime = useNavigationStore((s) => s.remainingTime);
   const hasDeviated = useNavigationStore((s) => s.hasDeviated);
+  const isDestinationReached = useNavigationStore((s) => s.isDestinationReached);
   const activeJourneyId = useNavigationStore((s) => s.activeJourneyId);
 
   const safePoints = useSafetyStore((s) => s.safePoints);
@@ -121,13 +122,19 @@ const ActiveJourneyPanel = () => {
       {/* ── Destination & Inline Metrics ── */}
       <div className="journey-dest-wrap">
         <h3 className="journey-dest-name">{destination?.name || 'Destination'}</h3>
-        <p className="journey-dest-subtitle">{destination?.subtitle || 'Navigating to destination'}</p>
-        
-        <div className="journey-metrics-inline">
-          <span className="journey-metric-text">{formatDistance(displayDistance)}</span>
-          <span className="journey-metric-dot">•</span>
-          <span className="journey-metric-text">{formatDuration(displayTime)}</span>
-        </div>
+        {isDestinationReached ? (
+          <p className="journey-dest-reached text-safe">🎉 Destination Reached!</p>
+        ) : (
+          <>
+            <p className="journey-dest-subtitle">{destination?.subtitle || 'Navigating to destination'}</p>
+            
+            <div className="journey-metrics-inline">
+              <span className="journey-metric-text">{formatDistance(displayDistance)}</span>
+              <span className="journey-metric-dot">•</span>
+              <span className="journey-metric-text">{formatDuration(displayTime)}</span>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="journey-divider" />
@@ -149,8 +156,8 @@ const ActiveJourneyPanel = () => {
       )}
 
       {/* ── End Journey ── */}
-      <button className="journey-end-btn" onClick={handleEndJourney}>
-        End Journey
+      <button className={isDestinationReached ? "journey-end-btn btn-primary bg-safe text-black" : "journey-end-btn"} onClick={handleEndJourney}>
+        {isDestinationReached ? 'Finish Journey' : 'End Journey'}
       </button>
 
     </div>

@@ -113,7 +113,7 @@ const SOSActiveScreen = ({ onResolve, apiStatus, userPosition, onRetry, contacts
 
         <div className="sos-status-item">
           <Users size={16} />
-          <span>Contacts: {apiStatus === 'success' ? (contactsAlerted?.length ? 'Notified' : 'None Configured') : 'Pending'}</span>
+          <span>Contacts: {apiStatus === 'success' ? (contactsAlerted?.length ? `App Alerts Sent (${contactsAlerted.length})` : 'None Configured') : 'Pending'}</span>
         </div>
 
         <div className="sos-status-item muted">

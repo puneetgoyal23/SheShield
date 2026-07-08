@@ -50,6 +50,8 @@ const EmptyState = () => {
   const setSafePointsVisible = useSafetyStore((s) => s.setSafePointsVisible);
   const isSafePointsVisible = useSafetyStore((s) => s.isSafePointsVisible);
   const safePoints = useSafetyStore((s) => s.safePoints);
+  const isLoadingSafePoints = useSafetyStore((s) => s.isLoadingSafePoints);
+  const safePointsError = useSafetyStore((s) => s.safePointsError);
   const pushToast = useUiStore((s) => s.pushToast);
 
   const toggleFilter = (type) => {
@@ -105,6 +107,21 @@ const EmptyState = () => {
           onClick={() => toggleFilter('pharmacy')}
         />
       </div>
+
+      {/* ── Status Indicators ── */}
+      {isLoadingSafePoints && (
+        <div className="bs-safe-points-status status-loading">
+          <span className="spinner-icon" aria-hidden="true">⏳</span>
+          <span>Locating nearby safe points...</span>
+        </div>
+      )}
+      
+      {safePointsError && (
+        <div className="bs-safe-points-status status-error">
+          <span className="error-icon" aria-hidden="true">⚠️</span>
+          <span>{safePointsError}</span>
+        </div>
+      )}
     </div>
   );
 };

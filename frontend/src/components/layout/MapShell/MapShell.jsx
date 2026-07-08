@@ -21,11 +21,14 @@ import AlertModal      from '../../alert/AlertModal/AlertModal';
 import ReportButton    from '../../report/ReportButton/ReportButton';
 import ReportModal     from '../../report/ReportModal/ReportModal';
 import LiveReportsFeed from '../../report/LiveReportsFeed/LiveReportsFeed';
+import EmergencyContactsButton from '../../contacts/EmergencyContactsButton/EmergencyContactsButton';
+import EmergencyContactsModal from '../../contacts/EmergencyContactsModal/EmergencyContactsModal';
 
 import useGeolocation    from '../../../hooks/useGeolocation';
 import useNavigationStore from '../../../stores/navigationStore';
 import useSafetyStore from '../../../stores/safetyStore';
 import useReportStore from '../../../stores/reportStore';
+import useJourneyTracker from '../../../hooks/useJourneyTracker';
 import axiosInstance from '../../../services/api/axiosInstance';
 
 import './MapShell.css';
@@ -39,8 +42,12 @@ const MapShell = () => {
   const setSafePoints = useSafetyStore((s) => s.setSafePoints);
   const setLoadingHeatMap = useSafetyStore((s) => s.setLoadingHeatMap);
   const setLoadingSafePoints = useSafetyStore((s) => s.setLoadingSafePoints);
+  const setSafePointsError = useSafetyStore((s) => s.setSafePointsError);
 
   const setReports = useReportStore((s) => s.setReports);
+
+  // Activate journey tracker hook (runs only in NAVIGATING mode)
+  useJourneyTracker();
 
   useEffect(() => {
     if (position) {
@@ -94,21 +101,32 @@ const MapShell = () => {
           'Women Help Centre': 'womens_desk',
         };
         const userLatLng = L.latLng(position.lat, position.lng);
-        const points = (pointsRes.data?.safePoints || []).map((p) => {
-          const pLat = parseFloat(p.latitude);
-          const pLng = parseFloat(p.longitude);
-          const distance = Math.round(userLatLng.distanceTo(L.latLng(pLat, pLng)));
-          
-          return {
-            ...p,
-            id:       p._id,
-            type:     CATEGORY_TO_TYPE[p.category] || 'hotel',
-            lat:      pLat,
-            lng:      pLng,
-            isOpen24h: p.openStatus?.toLowerCase().includes('24'),
-            distance: distance
-          };
-        });
+        const points = (pointsRes.data?.safePoints || [])
+          .map((p) => {
+            // Fallback to GeoJSON location if latitude/longitude are missing from old DB records
+            const rawLat = p.latitude ?? p.location?.coordinates?.[1];
+            const rawLng = p.longitude ?? p.location?.coordinates?.[0];
+            const pLat = parseFloat(rawLat);
+            const pLng = parseFloat(rawLng);
+            
+            if (Number.isNaN(pLat) || Number.isNaN(pLng)) {
+              return null; // Invalid coordinate
+            }
+
+            const distance = Math.round(userLatLng.distanceTo(L.latLng(pLat, pLng)));
+            
+            return {
+              ...p,
+              id:       p._id,
+              type:     CATEGORY_TO_TYPE[p.category] || 'hotel',
+              lat:      pLat,
+              lng:      pLng,
+              isOpen24h: p.openStatus?.toLowerCase().includes('24'),
+              distance: distance
+            };
+          })
+          .filter(Boolean); // Remove invalid points
+
         setSafePoints(points);
 
         // Normalize incidents to match the frontend reportStore shape
@@ -123,9 +141,9 @@ const MapShell = () => {
 
       } catch (error) {
         console.error('Failed to fetch safety data', error);
+        setSafePointsError('Failed to load nearby safe points. Please check your connection.');
       } finally {
         setLoadingHeatMap(false);
-        setLoadingSafePoints(false);
       }
     };
 
@@ -151,7 +169,10 @@ const MapShell = () => {
           </div>
 
           {/* Search */}
-          <SearchBar />
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <SearchBar />
+            <EmergencyContactsButton />
+          </div>
           
           {/* ── Live Reports Feed ── */}
           <LiveReportsFeed />
@@ -187,6 +208,7 @@ const MapShell = () => {
       {/* ── Modals ── */}
       <AlertModal />
       <ReportModal />
+      <EmergencyContactsModal />
 
     </div>
   );
