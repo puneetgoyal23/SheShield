@@ -5,7 +5,7 @@ import useRouteStore from '../../../stores/routeStore';
 import useNavigationStore from '../../../stores/navigationStore';
 import { APP_MODES, SHEET_STATES } from '../../../constants/appConstants';
 import { useDebounce } from '../../../hooks/useDebounce';
-import { geocodingApi } from '../../../services/api/geocodingApi';
+import { useGeocoding } from '../../../hooks/useGeocoding';
 import SearchSuggestions from '../SearchSuggestions/SearchSuggestions';
 import './SearchBar.css';
 
@@ -21,6 +21,8 @@ const SearchBar = () => {
   const [activeIndex, setActiveIndex] = useState(-1);
   const wrapperRef = useRef(null);
 
+  const { searchPlaces, reverseGeocode, isReady } = useGeocoding();
+
   const debouncedPickup = useDebounce(pickupQuery, 300);
   const debouncedDest = useDebounce(destQuery, 300);
 
@@ -34,20 +36,20 @@ const SearchBar = () => {
 
   // Initialize Pickup Location
   useEffect(() => {
-    if (hasUserEditedPickup) return;
+    if (hasUserEditedPickup || !isReady) return;
 
     if (!userPosition) {
       setPickupQuery("Fetching current location...");
     } else {
       // Reverse geocode on initial mount or when GPS becomes available
-      geocodingApi.reverseGeocode(userPosition[0], userPosition[1]).then(res => {
+      reverseGeocode(userPosition[0], userPosition[1]).then(res => {
         if (!hasUserEditedPickup) {
           setPickupQuery(res.name || 'Current Location');
           setOrigin(res); // populate origin store initially
         }
       });
     }
-  }, [userPosition, hasUserEditedPickup, setOrigin]);
+  }, [userPosition, hasUserEditedPickup, setOrigin, isReady, reverseGeocode]);
 
   // Fetch Suggestions
   useEffect(() => {
@@ -61,19 +63,19 @@ const SearchBar = () => {
       }
       
       setIsLoading(true);
-      const results = await geocodingApi.searchPlaces(activeQuery, userPosition);
+      const results = await searchPlaces(activeQuery, userPosition);
       setSuggestions(results);
       setIsLoading(false);
       setActiveIndex(-1);
     };
     
     // Only fetch if searching mode and a field is focused
-    if (appMode !== APP_MODES.PLANNING && focusedField) {
+    if (appMode !== APP_MODES.PLANNING && focusedField && isReady) {
       fetchSuggestions();
     } else {
       setSuggestions([]);
     }
-  }, [debouncedPickup, debouncedDest, focusedField, appMode, userPosition]);
+  }, [debouncedPickup, debouncedDest, focusedField, appMode, userPosition, isReady, searchPlaces]);
 
   // Click outside to close suggestions
   useEffect(() => {
