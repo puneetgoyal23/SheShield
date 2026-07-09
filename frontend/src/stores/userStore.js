@@ -1,5 +1,5 @@
 /**
- * userStore — User profile and trusted contacts.
+ * userStore — User profile and authentication token.
  * Persisted to localStorage automatically.
  */
 import { create } from 'zustand';
@@ -25,7 +25,6 @@ const save = (key, value) => {
 const useUserStore = create((set, get) => ({
   /* ── State ── */
   profile:         load(STORAGE_KEYS.USER_PROFILE, null),
-  trustedContacts: load(STORAGE_KEYS.TRUSTED_CONTACTS, []),
   isOnboarded:     !!localStorage.getItem(STORAGE_KEYS.ONBOARDED),
   token:           localStorage.getItem('ss_auth_token') || null,
 
@@ -45,32 +44,6 @@ const useUserStore = create((set, get) => ({
     set({ profile });
   },
 
-  /* ── Trusted Contacts ── */
-  addContact: (contact) =>
-    set((s) => {
-      const contacts = [
-        ...s.trustedContacts,
-        { id: `contact_${Date.now()}`, ...contact },
-      ];
-      save(STORAGE_KEYS.TRUSTED_CONTACTS, contacts);
-      return { trustedContacts: contacts };
-    }),
-
-  removeContact: (id) =>
-    set((s) => {
-      const contacts = s.trustedContacts.filter((c) => c.id !== id);
-      save(STORAGE_KEYS.TRUSTED_CONTACTS, contacts);
-      return { trustedContacts: contacts };
-    }),
-
-  updateContact: (id, updates) =>
-    set((s) => {
-      const contacts = s.trustedContacts.map((c) =>
-        c.id === id ? { ...c, ...updates } : c
-      );
-      save(STORAGE_KEYS.TRUSTED_CONTACTS, contacts);
-      return { trustedContacts: contacts };
-    }),
 
   /* ── Onboarding ── */
   markOnboarded: () => {
