@@ -8,6 +8,7 @@ import SplashScreen from './components/screens/SplashScreen/SplashScreen';
 import LoginScreen from './components/screens/LoginScreen/LoginScreen';
 import LocationPermissionScreen from './components/screens/LocationPermissionScreen/LocationPermissionScreen';
 import MapShell from './components/layout/MapShell/MapShell';
+import ProtectedRoute from './components/layout/ProtectedRoute/ProtectedRoute';
 
 function App() {
   return (
@@ -20,10 +21,10 @@ function App() {
         <Route path="/login" element={<LoginScreen />} />
         
         {/* Location Permission Screen */}
-        <Route path="/location" element={<LocationPermissionScreen />} />
+        <Route path="/location" element={<ProtectedRoute><LocationPermissionScreen /></ProtectedRoute>} />
         
         {/* Main Application Shell */}
-        <Route path="/map" element={<MapShell />} />
+        <Route path="/map" element={<ProtectedRoute><MapShell /></ProtectedRoute>} />
 
         {/* Fallback for unknown routes */}
         <Route path="*" element={<Navigate to="/" replace />} />

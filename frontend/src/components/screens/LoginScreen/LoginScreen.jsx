@@ -80,11 +80,6 @@ const LoginScreen = () => {
     }
   };
 
-  const handleGuest = (e) => {
-    e.preventDefault();
-    navigate('/location');
-  };
-
   const toggleMode = () => {
     setIsRegistering(!isRegistering);
     setError('');
@@ -206,11 +201,6 @@ const LoginScreen = () => {
             <button type="submit" className="login-btn-primary" disabled={isLoading}>
               {isLoading ? (isRegistering ? 'Creating Account…' : 'Signing in…') : (isRegistering ? 'Sign Up' : 'Login')}
             </button>
-            {!isRegistering && (
-              <button type="button" className="login-btn-secondary" onClick={handleGuest}>
-                Continue as Guest
-              </button>
-            )}
           </div>
         </form>
 
