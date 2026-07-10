@@ -52,8 +52,8 @@
   background: #8e24aa;
 }
 
-/* Popup Styling */
-.safe-point-popup .leaflet-popup-content-wrapper {
+/* Popup Styling for Google Maps InfoWindow */
+.safe-point-popup .gm-style-iw-c {
   background: var(--glass-bg-heavy);
   backdrop-filter: var(--glass-blur-heavy);
   -webkit-backdrop-filter: var(--glass-blur-heavy);
@@ -61,38 +61,24 @@
   border-radius: var(--r-lg);
   color: var(--color-text-primary);
   padding: 0;
-  /* Removed overflow: hidden so close button is visible */
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
 }
 
-/* Style Leaflet's native close button */
-.safe-point-popup .leaflet-popup-close-button {
-  color: var(--color-text-primary) !important;
-  font-size: 18px !important;
-  font-weight: bold;
-  top: 8px !important;
-  right: 8px !important;
-  width: 24px !important;
-  height: 24px !important;
-  line-height: 24px !important;
-  text-align: center;
-  border-radius: 50%;
-  background: var(--glass-bg) !important;
-  border: 1px solid var(--glass-border) !important;
-  transition: all var(--transition-fast) !important;
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-}
-
-.safe-point-popup .leaflet-popup-close-button:hover {
-  background: var(--color-surface-raised) !important;
-  color: var(--color-primary) !important;
-}
-
-.safe-point-popup .leaflet-popup-tip {
+.safe-point-popup .gm-style-iw-tc::after {
   background: var(--glass-bg-heavy);
   border: 1px solid var(--glass-border);
+}
+
+.safe-point-popup .gm-ui-hover-effect {
+  top: 8px !important;
+  right: 8px !important;
+  background: var(--glass-bg) !important;
+  border-radius: 50% !important;
+  border: 1px solid var(--glass-border) !important;
+}
+
+.safe-point-popup .gm-ui-hover-effect span {
+  background-color: var(--color-text-primary) !important;
 }
 
 .safe-point-popup-content {

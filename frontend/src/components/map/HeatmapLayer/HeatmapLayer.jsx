@@ -1,23 +1,36 @@
-import { useEffect, useRef, useMemo } from 'react';
-import { useMap } from 'react-leaflet';
-import L from 'leaflet';
-
-// Explicitly bind L to window for leaflet.heat to attach correctly in Vite ESM builds
-if (typeof window !== 'undefined') {
-  window.L = L;
-}
-import 'leaflet.heat';
+import { useEffect, useMemo, useState } from 'react';
+import { useMap } from '@vis.gl/react-google-maps';
+import { GoogleMapsOverlay } from '@deck.gl/google-maps';
+import { HeatmapLayer as DeckHeatmapLayer } from '@deck.gl/aggregation-layers';
 import useSafetyStore from '../../../stores/safetyStore';
 import useReportStore from '../../../stores/reportStore';
 
+// Converted from the previous Google Maps rgba strings to RGB arrays for deck.gl
+const COLOR_RANGE = [
+  [0, 255, 255],
+  [0, 191, 255],
+  [0, 127, 255],
+  [0, 63, 255],
+  [0, 0, 255],
+  [0, 0, 223],
+  [0, 0, 191],
+  [0, 0, 159],
+  [0, 0, 127],
+  [63, 0, 91],
+  [127, 0, 63],
+  [191, 0, 31],
+  [255, 0, 0]
+];
+
 const HeatmapLayer = () => {
   const map = useMap();
+  
   const heatMapData = useSafetyStore((s) => s.heatMapData);
   const isHeatmapVisible = useSafetyStore((s) => s.isHeatmapVisible);
   const timeSlot = useSafetyStore((s) => s.timeSlot);
   const reports = useReportStore((s) => s.reports);
   
-  const heatLayerRef = useRef(null);
+  const [overlay, setOverlay] = useState(null);
 
   // Combine external mock API heatmap data with local community reports
   const combinedHeatMapData = useMemo(() => {
@@ -26,7 +39,7 @@ const HeatmapLayer = () => {
     if (reports && reports.length > 0) {
       reports.forEach(report => {
         if (report.position && report.position.length >= 2) {
-          // [lat, lng, intensity]
+          // [lat, lng, weight]
           combined.push([report.position[0], report.position[1], 0.6]);
         }
       });
@@ -35,53 +48,57 @@ const HeatmapLayer = () => {
     return combined;
   }, [heatMapData, reports]);
 
+  // Create and manage the GoogleMapsOverlay instance lifecycle
   useEffect(() => {
     if (!map) return;
+    
+    // interleaved: true renders deck.gl directly in the Maps WebGL context,
+    // avoiding a separate canvas that causes recursive map artifacts on zoom.
+    const newOverlay = new GoogleMapsOverlay({ interleaved: true });
+    newOverlay.setMap(map);
+    setOverlay(newOverlay);
+    
+    return () => {
+      newOverlay.setProps({ layers: [] });
+      newOverlay.setMap(null);
+    };
+  }, [map]);
+
+  // Update deck.gl layers when data or visibility changes
+  useEffect(() => {
+    if (!overlay) return;
 
     if (!isHeatmapVisible || combinedHeatMapData.length === 0) {
-      if (heatLayerRef.current) {
-        map.removeLayer(heatLayerRef.current);
-        heatLayerRef.current = null;
-      }
+      overlay.setProps({ layers: [] });
       return;
     }
 
     // Adapt visualization based on time of day
-    // Night gets larger radius and higher blur to emphasize danger zones
     const radius = timeSlot.id === 'night' ? 35 : (timeSlot.id === 'day' ? 20 : 25);
-    const blur = timeSlot.id === 'night' ? 25 : 15;
-    
-    // Customize gradient to blend with dark map
-    // Customize gradient to blend with dark map but remain visible
-    const gradient = {
-      0.2: 'blue',
-      0.4: 'cyan',
-      0.6: 'lime',
-      0.8: 'yellow',
-      1.0: 'red'
-    };
 
-    if (heatLayerRef.current) {
-      map.removeLayer(heatLayerRef.current);
-    }
+    const dataPoints = combinedHeatMapData
+      .filter(pt => typeof pt[0] === 'number' && typeof pt[1] === 'number' && !Number.isNaN(pt[0]) && !Number.isNaN(pt[1]))
+      .map(pt => ({
+        // deck.gl expects [longitude, latitude]
+        position: [pt[1], pt[0]],
+        weight: pt[2] || 1
+      }));
 
-    heatLayerRef.current = L.heatLayer(combinedHeatMapData, {
-      radius,
-      blur,
-      maxZoom: 15,
-      gradient,
-      minOpacity: 0.5
-    }).addTo(map);
+    const deckLayer = new DeckHeatmapLayer({
+      id: 'safety-heatmap',
+      data: dataPoints,
+      getPosition: d => d.position,
+      getWeight: d => d.weight,
+      radiusPixels: radius,
+      colorRange: COLOR_RANGE,
+      intensity: 1
+    });
 
-    return () => {
-      if (heatLayerRef.current) {
-        map.removeLayer(heatLayerRef.current);
-        heatLayerRef.current = null;
-      }
-    };
-  }, [map, combinedHeatMapData, isHeatmapVisible, timeSlot]);
+    overlay.setProps({ layers: [deckLayer] });
 
-  return null; // Heatmap does not render React children
+  }, [overlay, combinedHeatMapData, isHeatmapVisible, timeSlot]);
+
+  return null;
 };
 
 export default HeatmapLayer;

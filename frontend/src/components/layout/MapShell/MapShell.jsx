@@ -8,7 +8,7 @@
  *   3. Remains a pure layout component — no business logic here.
  */
 import { useEffect } from 'react';
-import L from 'leaflet';
+import { haversineDistance } from '../../../utils/geoUtils';
 
 import MapContainer    from '../../map/MapContainer/MapContainer';
 import SearchBar       from '../../search/SearchBar/SearchBar';
@@ -103,7 +103,6 @@ const MapShell = () => {
           'Bus Terminal':      'bus_stand',
           'Women Help Centre': 'womens_desk',
         };
-        const userLatLng = L.latLng(position.lat, position.lng);
         const points = (pointsRes.data?.safePoints || [])
           .map((p) => {
             // Fallback to GeoJSON location if latitude/longitude are missing from old DB records
@@ -116,7 +115,7 @@ const MapShell = () => {
               return null; // Invalid coordinate
             }
 
-            const distance = Math.round(userLatLng.distanceTo(L.latLng(pLat, pLng)));
+            const distance = Math.round(haversineDistance([position.lat, position.lng], [pLat, pLng]));
             
             return {
               ...p,

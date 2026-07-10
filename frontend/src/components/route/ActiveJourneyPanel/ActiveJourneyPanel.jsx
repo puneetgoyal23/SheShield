@@ -14,6 +14,7 @@ import './ActiveJourneyPanel.css';
 
 const ActiveJourneyPanel = () => {
   const routes = useRouteStore((s) => s.routes);
+  const activeRoutePersistent = useRouteStore((s) => s.activeRoute);
   const activeRouteIndex = useRouteStore((s) => s.activeRouteIndex);
   const destination = useRouteStore((s) => s.destination);
   const clearRoute = useRouteStore((s) => s.clearRoute);
@@ -39,9 +40,8 @@ const ActiveJourneyPanel = () => {
 
   const [showSafePtFlash, setShowSafePtFlash] = useState(false);
 
-  const activeRoute = routes[activeRouteIndex];
-
-  if (!activeRoute) return null;
+  // Use the persistent activeRoute in navigation mode
+  const activeRoute = activeRoutePersistent || routes[activeRouteIndex];
 
   // Active route geometry for corridor-aware safe point selection
   const routeGeometry = activeRoute?.geometry ?? null;
@@ -51,6 +51,8 @@ const ActiveJourneyPanel = () => {
     () => rankSafePointsForRoute(safePoints, routeGeometry, userPosition, 1)[0] ?? null,
     [safePoints, routeGeometry, userPosition]
   );
+
+  if (!activeRoute) return null;
 
   // Derive distance and time. Fallback to route total if navigationStore hasn't updated yet.
   const displayDistance = remainingDistance || activeRoute.distance;

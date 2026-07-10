@@ -10,17 +10,30 @@ import './MapControls.css';
 
 const MapControls = () => {
   const mapInstance  = useMapStore((s) => s.mapInstance);
+  const flyTo        = useMapStore((s) => s.flyTo);
   const userPosition = useNavigationStore((s) => s.userPosition);
 
-  const zoomIn  = () => mapInstance?.zoomIn(1);
-  const zoomOut = () => mapInstance?.zoomOut(1);
+  const zoomIn  = (e) => {
+    e.stopPropagation();
+    if (mapInstance) {
+      const currentZoom = mapInstance.getZoom() || 15;
+      mapInstance.setZoom(Math.min(currentZoom + 1, 21));
+    }
+  };
+  
+  const zoomOut = (e) => {
+    e.stopPropagation();
+    if (mapInstance) {
+      const currentZoom = mapInstance.getZoom() || 15;
+      mapInstance.setZoom(Math.max(currentZoom - 1, 3));
+    }
+  };
 
-  const goToMyLocation = () => {
+  const goToMyLocation = (e) => {
+    e.stopPropagation();
     if (userPosition && mapInstance) {
-      mapInstance.flyTo(userPosition, NAVIGATION_ZOOM, {
-        animate: true,
-        duration: 1.0,
-      });
+      // Use the action from mapStore which handles the conversion
+      flyTo(userPosition, NAVIGATION_ZOOM);
     }
   };
 

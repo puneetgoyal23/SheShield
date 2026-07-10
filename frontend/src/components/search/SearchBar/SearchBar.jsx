@@ -128,14 +128,16 @@ const SearchBar = () => {
     }
   };
 
-  const handleSelect = (item) => {
+  const handleSelect = async (item) => {
+    let selectedItem = item;
+
     if (focusedField === 'pickup') {
-      setPickupQuery(item.name);
+      setPickupQuery(selectedItem.name);
       setHasUserEditedPickup(true);
-      setOrigin(item);
+      setOrigin(selectedItem);
       setFocusedField('dest'); // Automatically focus dest next
     } else {
-      setDestQuery(item.name);
+      setDestQuery(selectedItem.name);
       setFocusedField(null);
       
       // Ensure origin is set to userPosition fallback if user didn't edit pickup but somehow the origin store is empty
@@ -147,7 +149,7 @@ const SearchBar = () => {
          });
       }
 
-      setDestination(item);
+      setDestination(selectedItem);
       setAppMode(APP_MODES.PLANNING);
       setBottomSheet(SHEET_STATES.HALF);
     }

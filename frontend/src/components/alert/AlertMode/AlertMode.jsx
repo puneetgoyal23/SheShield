@@ -30,10 +30,10 @@ const AlertMode = () => {
     if (!isAlertModeActive || appMode !== APP_MODES.NAVIGATING || isModalVisible || !userPosition) return;
     
     const currentRoute = routes[activeRouteIndex];
-    if (!currentRoute || !currentRoute.coordinates) return;
+    if (!currentRoute || !currentRoute.geometry) return;
 
     // Use geoUtils to find distance
-    const { distance } = closestPointOnRoute(userPosition, currentRoute.coordinates);
+    const { distance } = closestPointOnRoute(userPosition, currentRoute.geometry);
     
     if (distance > DEVIATION_THRESHOLD_METERS) {
       if (!isCooldownActive) {

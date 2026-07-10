@@ -8,34 +8,7 @@
 @import './reset.css';
 @import './animations.css';
 
-/* ══ Leaflet Map Overrides ══ */
 
-.leaflet-container {
-  height: 100%;
-  width: 100%;
-  background: var(--color-bg) !important;
-  font-family: var(--font-sans) !important;
-}
-
-/* Hide default attribution (we style it below) */
-.leaflet-control-attribution {
-  background: var(--glass-bg-heavy) !important;
-  backdrop-filter: var(--glass-blur-light) !important;
-  color: var(--color-text-muted) !important;
-  font-size: var(--text-2xs) !important;
-  border-radius: var(--r-xs) 0 0 0 !important;
-  padding: 3px 8px !important;
-  border: none !important;
-}
-
-.leaflet-control-attribution a {
-  color: var(--color-primary-light) !important;
-}
-
-/* Remove default zoom controls (using custom ones) */
-.leaflet-control-zoom {
-  display: none !important;
-}
 
 /* ══ User Location Marker Styles ══
    These live here because Leaflet DivIcons render

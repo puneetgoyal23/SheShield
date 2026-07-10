@@ -1,10 +1,61 @@
-import React, { useEffect } from 'react';
-import { Polyline, useMap } from 'react-leaflet';
-import L from 'leaflet';
+import React, { useEffect, useRef } from 'react';
+import { useMap } from '@vis.gl/react-google-maps';
 import useRouteStore from '../../../stores/routeStore';
 import useUiStore from '../../../stores/uiStore';
+import { APP_MODES } from '../../../constants/appConstants';
 import { routingApi } from '../../../services/api/routingApi';
 import './RouteLayer.css';
+
+const GooglePolyline = ({ positions, pathOptions, eventHandlers }) => {
+  const map = useMap();
+  const polylineRef = useRef(null);
+
+  // 1. Create polyline instance once
+  useEffect(() => {
+    if (!polylineRef.current && window.google) {
+      polylineRef.current = new window.google.maps.Polyline();
+    }
+    return () => {
+      if (polylineRef.current) {
+        polylineRef.current.setMap(null);
+        window.google.maps.event.clearInstanceListeners(polylineRef.current);
+        polylineRef.current = null;
+      }
+    };
+  }, []);
+
+  // 2. Attach to map
+  useEffect(() => {
+    if (!polylineRef.current || !map) return;
+    polylineRef.current.setMap(map);
+  }, [map]);
+
+  // 3. Update options
+  useEffect(() => {
+    if (!polylineRef.current) return;
+    
+    const options = {
+      path: positions.map(p => ({ lat: p[0], lng: p[1] })),
+      strokeColor: pathOptions.color,
+      strokeOpacity: pathOptions.opacity,
+      strokeWeight: pathOptions.weight,
+      clickable: !!eventHandlers?.click,
+      zIndex: pathOptions.zIndex !== undefined ? pathOptions.zIndex : pathOptions.weight
+    };
+    
+    polylineRef.current.setOptions(options);
+    
+    // Manage click listener
+    if (eventHandlers?.click) {
+      const listener = polylineRef.current.addListener('click', eventHandlers.click);
+      return () => {
+        window.google.maps.event.removeListener(listener);
+      };
+    }
+  }, [positions, pathOptions, eventHandlers]);
+
+  return null;
+};
 
 const RouteLayer = () => {
   const map = useMap();
@@ -12,13 +63,15 @@ const RouteLayer = () => {
   const destination = useRouteStore((s) => s.destination);
   const routes = useRouteStore((s) => s.routes);
   const activeRouteIndex = useRouteStore((s) => s.activeRouteIndex);
+  const activeRoutePersistent = useRouteStore((s) => s.activeRoute);
   
   const setRoutes = useRouteStore((s) => s.setRoutes);
   const setLoading = useRouteStore((s) => s.setLoading);
   const setError = useRouteStore((s) => s.setError);
-  const setActiveRoute = useRouteStore((s) => s.setActiveRoute);
+  const setActiveRouteIndex = useRouteStore((s) => s.setActiveRouteIndex);
   
   const pushToast = useUiStore((s) => s.pushToast);
+  const appMode = useUiStore((s) => s.appMode);
 
   // Fetch routes when origin and destination change
   useEffect(() => {
@@ -40,8 +93,8 @@ const RouteLayer = () => {
         }
       } catch (err) {
         console.error('RouteLayer: Routing failed for origin/destination.', { origin, destination, error: err.message });
-        setError(err.message || 'Failed to find route');
         setRoutes([]);
+        setError(err.message || 'Failed to find route');
       } finally {
         setLoading(false);
       }
@@ -52,60 +105,62 @@ const RouteLayer = () => {
 
   // Fit map bounds to active route
   useEffect(() => {
-    if (routes.length > 0 && activeRouteIndex >= 0 && activeRouteIndex < routes.length) {
-      const activeRoute = routes[activeRouteIndex];
-      if (activeRoute.geometry && activeRoute.geometry.length > 0) {
-        const bounds = L.latLngBounds(activeRoute.geometry);
-        // Add padding to account for floating UI elements
-        map.flyToBounds(bounds, {
-          paddingTopLeft: [20, 100], // Space for SearchBar
-          paddingBottomRight: [20, 300], // Space for BottomSheet and controls
-          animate: true,
-          duration: 1.5,
+    const activeRoute = appMode === APP_MODES.NAVIGATING ? activeRoutePersistent : routes[activeRouteIndex];
+    if (activeRoute && activeRoute.geometry && activeRoute.geometry.length > 0 && map) {
+      const bounds = new window.google.maps.LatLngBounds();
+      activeRoute.geometry.forEach(p => {
+        if (Number.isFinite(p[0]) && Number.isFinite(p[1])) {
+          bounds.extend({ lat: p[0], lng: p[1] });
+        }
+      });
+      
+      if (!bounds.isEmpty()) {
+        map.fitBounds(bounds, {
+          padding: { top: 100, right: 20, bottom: 300, left: 20 }
         });
       }
     }
-  }, [routes, activeRouteIndex, map]);
+  }, [routes, activeRouteIndex, activeRoutePersistent, map, appMode]);
 
-  const getRouteColor = (route, isActive) => {
-    if (!isActive) return '#9e9e9e'; // Gray for inactive
-    if (route.type === 'safe') return '#00e5ff'; // Vibrant Cyan
+  const getRouteColor = (route) => {
+    if (route.type === 'safe') return '#00e676'; // Emerald Green
     if (route.type === 'fast') return '#ff2d95'; // Vibrant Magenta
-    return '#b388ff'; // Vibrant Purple fallback
+    return '#00b0ff'; // Cyan/Blue
   };
 
-  if (!routes || routes.length === 0) return null;
+  const isNavigating = appMode === APP_MODES.NAVIGATING;
+  const currentActiveRoute = isNavigating ? activeRoutePersistent : routes[activeRouteIndex];
 
-  // Render inactive routes first (so they are below the active one), then active route
+  if (!isNavigating && (!routes || routes.length === 0)) return null;
+  if (isNavigating && !currentActiveRoute) return null;
+
   return (
     <>
-      {routes.map((route, index) => {
+      {!isNavigating && routes.map((route, index) => {
         if (index === activeRouteIndex) return null; // Skip active route for now
         
         return (
           <React.Fragment key={`inactive_group_${route.id}`}>
             {/* Inactive Route Outline (Shadow) */}
-            <Polyline
+            <GooglePolyline
               positions={route.geometry}
-              eventHandlers={{ click: () => setActiveRoute(index) }}
+              eventHandlers={{ click: () => setActiveRouteIndex(index) }}
               pathOptions={{
-                color: '#000000',
-                weight: 9,
-                opacity: 0.6,
-                lineCap: 'round',
-                lineJoin: 'round',
+                color: '#1a1a2e',
+                weight: 6,
+                opacity: 0.5,
+                zIndex: 10
               }}
             />
             {/* Inactive Route Inner */}
-            <Polyline
+            <GooglePolyline
               positions={route.geometry}
-              eventHandlers={{ click: () => setActiveRoute(index) }}
+              eventHandlers={{ click: () => setActiveRouteIndex(index) }}
               pathOptions={{
-                color: getRouteColor(route, false),
-                weight: 5,
-                opacity: 0.8,
-                lineCap: 'round',
-                lineJoin: 'round',
+                color: getRouteColor(route),
+                weight: 4,
+                opacity: 0.6,
+                zIndex: 11
               }}
             />
           </React.Fragment>
@@ -113,30 +168,26 @@ const RouteLayer = () => {
       })}
       
       {/* Active Route */}
-      {routes[activeRouteIndex] && (
-        <React.Fragment key={`active_group_${routes[activeRouteIndex].id}`}>
+      {currentActiveRoute && (
+        <React.Fragment key={`active_group_${currentActiveRoute.id}`}>
           {/* Active Route Outline (Shadow) */}
-          <Polyline
-            positions={routes[activeRouteIndex].geometry}
+          <GooglePolyline
+            positions={currentActiveRoute.geometry}
             pathOptions={{
-              color: '#000000',
-              weight: 12, // Thicker outline
-              opacity: 0.8,
-              lineCap: 'round',
-              lineJoin: 'round',
-              className: 'active-route-outline'
+              color: '#0f0f1a',
+              weight: 8,
+              opacity: 0.9,
+              zIndex: 100
             }}
           />
-          {/* Active Route Inner */}
-          <Polyline
-            positions={routes[activeRouteIndex].geometry}
+          {/* Active Route Core */}
+          <GooglePolyline
+            positions={currentActiveRoute.geometry}
             pathOptions={{
-              color: getRouteColor(routes[activeRouteIndex], true),
-              weight: 8, // Thicker 8px bright route
+              color: getRouteColor(currentActiveRoute),
+              weight: 6,
               opacity: 1,
-              lineCap: 'round',
-              lineJoin: 'round',
-              className: 'active-route-path'
+              zIndex: 101
             }}
           />
         </React.Fragment>

@@ -1,8 +1,6 @@
-import React, { useMemo } from 'react';
-import { Marker, Popup } from 'react-leaflet';
-import L from 'leaflet';
-import { UserX, AlertTriangle, LightbulbOff, MessageSquareWarning, Clock, Eye } from 'lucide-react';
-import { renderToStaticMarkup } from 'react-dom/server';
+import React, { useMemo, useState, useEffect } from 'react';
+import { AdvancedMarker, InfoWindow, useMap } from '@vis.gl/react-google-maps';
+import { UserX, AlertTriangle, LightbulbOff, MessageSquareWarning, Clock, Eye, X } from 'lucide-react';
 import useReportStore from '../../../stores/reportStore';
 import './CommunityIncidentsLayer.css';
 
@@ -22,36 +20,6 @@ const getCategoryIcon = (category) => {
   }
 };
 
-const createIncidentIcon = (category) => {
-  const iconMarkup = renderToStaticMarkup(getCategoryIcon(category));
-  // Replace space with dot for CSS class (e.g. Unsafe Area -> marker-Unsafe.Area)
-  const safeClass = category.replace(/\s+/g, '.');
-  
-  return L.divIcon({
-    html: `<div class="incident-point-marker marker-${safeClass}">${iconMarkup}</div>`,
-    className: 'custom-incident-icon',
-    iconSize: [26, 26],
-    iconAnchor: [13, 13],
-    popupAnchor: [0, -13]
-  });
-};
-
-const createGroupedIcon = (count) => {
-  const iconMarkup = renderToStaticMarkup(<MessageSquareWarning size={16} />);
-  return L.divIcon({
-    html: `
-      <div class="incident-point-marker marker-Grouped">
-        ${iconMarkup}
-        <div class="incident-group-badge">${count}</div>
-      </div>
-    `,
-    className: 'custom-incident-icon',
-    iconSize: [28, 28],
-    iconAnchor: [14, 14],
-    popupAnchor: [0, -14]
-  });
-};
-
 const formatTime = (isoString) => {
   const date = new Date(isoString);
   const now = new Date();
@@ -69,6 +37,18 @@ const formatTime = (isoString) => {
 
 const CommunityIncidentsLayer = () => {
   const reports = useReportStore((s) => s.reports);
+  const [activePopupId, setActivePopupId] = useState(null);
+  const map = useMap();
+
+  useEffect(() => {
+    if (!map) return;
+    const listener = window.google.maps.event.addListener(map, 'click', () => {
+      setActivePopupId(null);
+    });
+    return () => {
+      window.google.maps.event.removeListener(listener);
+    };
+  }, [map]);
 
   const groupedReports = useMemo(() => {
     const groups = [];
@@ -100,61 +80,86 @@ const CommunityIncidentsLayer = () => {
     <>
       {groupedReports.map((group) => {
         const isGrouped = group.reports.length > 1;
+        const category = group.reports[0].category || 'Other';
+        const safeClass = category.replace(/\s+/g, '.');
 
         return (
-          <Marker
-            key={group.id}
-            position={[group.lat, group.lng]}
-            icon={isGrouped ? createGroupedIcon(group.reports.length) : createIncidentIcon(group.reports[0].category)}
-          >
-            <Popup 
-              className="incident-popup"
-              autoPanPadding={[50, 50]}
-              closeButton={true}
+          <React.Fragment key={group.id}>
+            <AdvancedMarker
+              position={{ lat: group.lat + 0.00002, lng: group.lng + 0.00002 }}
+              onClick={() => setActivePopupId(group.id)}
+              zIndex={activePopupId === group.id ? 2000 : 1000}
             >
-              <div className={`incident-popup-content ${isGrouped ? 'grouped-popup-content' : ''}`}>
-                <span className="incident-popup-label">
-                  {isGrouped ? 'Multiple Reports' : 'Community Report'}
-                </span>
-                
-                {isGrouped ? (
-                  // Grouped Popup Render
-                  <div className="grouped-reports-list">
-                    {group.reports.map((report, idx) => (
-                      <React.Fragment key={report.id}>
-                        <div className="grouped-report-item">
-                          <div className="grouped-report-header">
-                            <h3>{report.category}</h3>
-                            <p className="incident-time">
-                              <Clock size={12} />
-                              {formatTime(report.timestamp)}
-                            </p>
-                          </div>
-                          {report.description && (
-                            <p className="incident-desc">{report.description}</p>
-                          )}
-                        </div>
-                        {idx < group.reports.length - 1 && <div className="grouped-divider" />}
-                      </React.Fragment>
-                    ))}
-                  </div>
-                ) : (
-                  // Single Popup Render
-                  <>
-                    <h3>{group.reports[0].category}</h3>
-                    {group.reports[0].description && (
-                      <p className="incident-desc">{group.reports[0].description}</p>
-                    )}
-                    <p className="incident-time">
-                      <Clock size={12} />
-                      {formatTime(group.reports[0].timestamp)}
-                    </p>
-                  </>
-                )}
+              {isGrouped ? (
+                <div className="incident-point-marker marker-Grouped">
+                  <MessageSquareWarning size={16} />
+                  <div className="incident-group-badge">{group.reports.length}</div>
+                </div>
+              ) : (
+                <div className={`incident-point-marker marker-${safeClass}`}>
+                  {getCategoryIcon(category)}
+                </div>
+              )}
+            </AdvancedMarker>
 
-              </div>
-            </Popup>
-          </Marker>
+            {activePopupId === group.id && (
+              <InfoWindow
+                position={{ lat: group.lat, lng: group.lng }}
+                onCloseClick={() => setActivePopupId(null)}
+                pixelOffset={[0, -20]}
+                headerDisabled={true}
+                className="incident-popup"
+              >
+                <div className={`incident-popup-content ${isGrouped ? 'grouped-popup-content' : ''}`}>
+                  <button 
+                    className="incident-popup-close" 
+                    onClick={(e) => { e.stopPropagation(); setActivePopupId(null); }}
+                    aria-label="Close"
+                  >
+                    <X size={16} />
+                  </button>
+                  <span className="incident-popup-label">
+                    {isGrouped ? 'Multiple Reports' : 'Community Report'}
+                  </span>
+                  
+                  {isGrouped ? (
+                    // Grouped Popup Render
+                    <div className="grouped-reports-list">
+                      {group.reports.map((report, idx) => (
+                        <React.Fragment key={report.id}>
+                          <div className="grouped-report-item">
+                            <div className="grouped-report-header">
+                              <h3>{report.category}</h3>
+                              <p className="incident-time">
+                                <Clock size={12} />
+                                {formatTime(report.timestamp)}
+                              </p>
+                            </div>
+                            {report.description && (
+                              <p className="incident-desc">{report.description}</p>
+                            )}
+                          </div>
+                          {idx < group.reports.length - 1 && <div className="grouped-divider" />}
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  ) : (
+                    // Single Popup Render
+                    <>
+                      <h3>{group.reports[0].category}</h3>
+                      {group.reports[0].description && (
+                        <p className="incident-desc">{group.reports[0].description}</p>
+                      )}
+                      <p className="incident-time">
+                        <Clock size={12} />
+                        {formatTime(group.reports[0].timestamp)}
+                      </p>
+                    </>
+                  )}
+                </div>
+              </InfoWindow>
+            )}
+          </React.Fragment>
         );
       })}
     </>

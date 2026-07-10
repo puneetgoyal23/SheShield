@@ -105,6 +105,7 @@ const RouteCard = ({ route, isActive, isExpanded, onToggleExpand, onClick, onSta
 const RouteCards = () => {
   const routes = useRouteStore((s) => s.routes);
   const activeRouteIndex = useRouteStore((s) => s.activeRouteIndex);
+  const setActiveRouteIndex = useRouteStore((s) => s.setActiveRouteIndex);
   const setActiveRoute = useRouteStore((s) => s.setActiveRoute);
   const isLoading = useRouteStore((s) => s.isLoading);
   const error = useRouteStore((s) => s.error);
@@ -120,6 +121,9 @@ const RouteCards = () => {
 
   const handleStartNavigation = async () => {
     const activeRoute = routes[activeRouteIndex];
+    // Persist the actual route object so it survives any array resets
+    setActiveRoute(activeRoute);
+    
     // Switch UI to navigating immediately so the user isn’t blocked
     setAppMode(APP_MODES.NAVIGATING);
     setBottomSheet(SHEET_STATES.HIDDEN);
@@ -176,7 +180,7 @@ const RouteCards = () => {
             e.stopPropagation();
             setExpandedIndex(expandedIndex === index ? null : index);
           }}
-          onClick={() => setActiveRoute(index)}
+          onClick={() => setActiveRouteIndex(index)}
           onStartNavigation={handleStartNavigation}
         />
       ))}

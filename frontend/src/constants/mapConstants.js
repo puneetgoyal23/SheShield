@@ -4,7 +4,7 @@
  */
 
 /** Default map center — New Delhi, India */
-export const DEFAULT_CENTER = [28.6139, 77.2090];
+export const DEFAULT_CENTER = { lat: 28.6139, lng: 77.2090 };
 export const DEFAULT_ZOOM = 14;
 export const MIN_ZOOM = 10;
 export const MAX_ZOOM = 19;

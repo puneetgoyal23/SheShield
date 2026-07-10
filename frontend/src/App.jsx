@@ -9,12 +9,13 @@ import LoginScreen from './components/screens/LoginScreen/LoginScreen';
 import LocationPermissionScreen from './components/screens/LocationPermissionScreen/LocationPermissionScreen';
 import MapShell from './components/layout/MapShell/MapShell';
 import ProtectedRoute from './components/layout/ProtectedRoute/ProtectedRoute';
+import ErrorBoundary from './components/ErrorBoundary';
 
 import { APIProvider } from '@vis.gl/react-google-maps';
 
 function App() {
   return (
-    <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY} libraries={['places']}>
+    <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY} libraries={['places', 'visualization', 'marker']}>
       <BrowserRouter>
         <Routes>
           {/* Entry point: Splash Screen */}
@@ -25,9 +26,15 @@ function App() {
           
           {/* Location Permission Screen */}
           <Route path="/location" element={<ProtectedRoute><LocationPermissionScreen /></ProtectedRoute>} />
-          
+
           {/* Main Application Shell */}
-          <Route path="/map" element={<ProtectedRoute><MapShell /></ProtectedRoute>} />
+          <Route path="/map" element={
+            <ProtectedRoute>
+              <ErrorBoundary>
+                <MapShell />
+              </ErrorBoundary>
+            </ProtectedRoute>
+          } />
 
           {/* Fallback for unknown routes */}
           <Route path="*" element={<Navigate to="/" replace />} />

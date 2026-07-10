@@ -4,7 +4,6 @@ import { useMapsLibrary } from '@vis.gl/react-google-maps';
 export const useGeocoding = () => {
   const placesLib = useMapsLibrary('places');
   const geocodingLib = useMapsLibrary('geocoding');
-  const coreLib = useMapsLibrary('core');
   
   const [autocompleteService, setAutocompleteService] = useState(null);
   const [geocoder, setGeocoder] = useState(null);
@@ -25,52 +24,60 @@ export const useGeocoding = () => {
   }, [geocodingLib, geocoder]);
 
   const searchPlaces = useCallback(async (query, userPosition) => {
-    if (!query || !query.trim() || !autocompleteService || !geocoder) return [];
+    if (!query || !query.trim()) return [];
     
     try {
-      const request = {
-        input: query,
-        componentRestrictions: { country: 'in' },
-      };
+      // Fallback to free Nominatim OpenStreetMap search since Google Places requires billing
+      let url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=in&limit=5`;
       
-      if (userPosition && userPosition.length === 2 && coreLib) {
-        request.locationBias = new coreLib.Circle({
-          center: { lat: userPosition[0], lng: userPosition[1] },
-          radius: 25000,
-        });
+      // Add optional location bias if userPosition is available (approximate bounding box)
+      if (userPosition && userPosition.length === 2) {
+        const lat = userPosition[0];
+        const lng = userPosition[1];
+        // 0.2 degrees is roughly 22km
+        url += `&viewbox=${lng - 0.2},${lat + 0.2},${lng + 0.2},${lat - 0.2}&bounded=0`;
       }
       
-      const response = await autocompleteService.getPlacePredictions(request);
+      const response = await fetch(url, {
+        headers: { 'Accept-Language': 'en-US,en;q=0.9' }
+      });
       
-      if (!response || !response.predictions) return [];
-
-      const results = await Promise.all(response.predictions.map(async (prediction) => {
-        try {
-          const geoRes = await geocoder.geocode({ placeId: prediction.place_id });
-          if (geoRes.results && geoRes.results.length > 0) {
-            const loc = geoRes.results[0].geometry.location;
-            return {
-              id: prediction.place_id,
-              name: prediction.structured_formatting.main_text,
-              subtitle: prediction.structured_formatting.secondary_text,
-              lat: loc.lat(),
-              lng: loc.lng(),
-              type: 'place'
-            };
-          }
-        } catch (e) {
-          console.warn("Geocoding failed for place_id", prediction.place_id, e);
-        }
-        return null;
-      }));
+      if (!response.ok) return [];
       
-      return results.filter(Boolean);
+      const data = await response.json();
+      
+      const results = data.map((item) => {
+        const nameParts = item.display_name.split(',');
+        return {
+          id: item.place_id.toString(),
+          name: nameParts[0].trim(),
+          subtitle: nameParts.slice(1).join(',').trim(),
+          lat: parseFloat(item.lat),
+          lng: parseFloat(item.lon),
+          type: 'place'
+        };
+      });
+      
+      return results;
     } catch (error) {
-      console.error('Places autocomplete error:', error);
+      console.error('Nominatim search error:', error);
       return [];
     }
-  }, [autocompleteService, geocoder, coreLib]);
+  }, []);
 
+  const getPlaceDetails = useCallback(async (placeId) => {
+    if (!geocoder) return null;
+    try {
+      const geoRes = await geocoder.geocode({ placeId });
+      if (geoRes.results && geoRes.results.length > 0) {
+        const loc = geoRes.results[0].geometry.location;
+        return { lat: loc.lat(), lng: loc.lng() };
+      }
+    } catch (e) {
+      console.warn("Geocoding failed for place_id", placeId, e);
+    }
+    return null;
+  }, [geocoder]);
   const reverseGeocode = useCallback(async (lat, lng) => {
     if (!geocoder) {
       return {
@@ -86,21 +93,25 @@ export const useGeocoding = () => {
       if (response.results && response.results.length > 0) {
         const result = response.results[0];
         
-        // Find a decent short name
-        let name = 'Selected Location';
+        let nameParts = [];
         const addressComponents = result.address_components;
         if (addressComponents.length > 0) {
-          const route = addressComponents.find(c => c.types.includes('route'));
-          const sublocality = addressComponents.find(c => c.types.includes('sublocality'));
+          const sublocality = addressComponents.find(c => c.types.includes('sublocality') || c.types.includes('sublocality_level_1'));
           const locality = addressComponents.find(c => c.types.includes('locality'));
+          const route = addressComponents.find(c => c.types.includes('route'));
           const poi = addressComponents.find(c => c.types.includes('point_of_interest'));
           
-          if (poi) name = poi.long_name;
-          else if (route) name = route.long_name;
-          else if (sublocality) name = sublocality.long_name;
-          else if (locality) name = locality.long_name;
-          else name = addressComponents[0].long_name;
+          if (poi) nameParts.push(poi.long_name);
+          else if (sublocality) nameParts.push(sublocality.long_name);
+          else if (route) nameParts.push(route.long_name);
+          else if (addressComponents[0]) nameParts.push(addressComponents[0].long_name);
+          
+          if (locality && locality.long_name !== nameParts[0]) {
+            nameParts.push(locality.long_name);
+          }
         }
+        
+        let name = nameParts.length > 0 ? nameParts.join(', ') : 'Selected Location';
 
         return {
           name,
@@ -111,9 +122,9 @@ export const useGeocoding = () => {
       }
       throw new Error("No results found");
     } catch (error) {
-      console.error('Reverse geocoding error:', error);
+      console.warn('Reverse geocoding failed: The Google Geocoding API might be disabled on this API key. Please enable it in the Google Cloud Console for exact locality names.');
       return {
-        name: 'Current Location',
+        name: 'My Location',
         subtitle: `${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E`,
         lat,
         lng
@@ -121,5 +132,5 @@ export const useGeocoding = () => {
     }
   }, [geocoder]);
 
-  return { searchPlaces, reverseGeocode, isReady: !!(autocompleteService && geocoder) };
+  return { searchPlaces, getPlaceDetails, reverseGeocode, isReady: true };
 };

@@ -14,29 +14,40 @@ const useMapStore = create((set, get) => ({
   zoom:        DEFAULT_ZOOM,
   mapInstance: null,
   isMapReady:  false,
+  mapTypeId:   'roadmap',
 
   /* ── Actions ── */
   setCenter: (center) => set({ center }),
   setZoom:   (zoom)   => set({ zoom }),
+  toggleMapType: () => set((s) => ({ mapTypeId: s.mapTypeId === 'roadmap' ? 'satellite' : 'roadmap' })),
 
   setMapInstance: (instance) =>
     set({ mapInstance: instance, isMapReady: !!instance }),
 
-  /** Smooth animated fly to a latlng position */
+  /** Smooth animated pan to a latlng position */
   flyTo: (latlng, zoom) => {
     const { mapInstance } = get();
     if (!mapInstance) return;
-    mapInstance.flyTo(latlng, zoom ?? DEFAULT_ZOOM, {
-      animate: true,
-      duration: FLY_DURATION_SECONDS,
-    });
+    
+    // Convert Leaflet arrays [lat, lng] to Google's {lat, lng} if necessary
+    const target = Array.isArray(latlng) 
+      ? { lat: parseFloat(latlng[0]), lng: parseFloat(latlng[1]) } 
+      : latlng;
+      
+    mapInstance.panTo(target);
+    mapInstance.setZoom(zoom ?? DEFAULT_ZOOM);
   },
 
   /** Instant pan without zoom change */
   panTo: (latlng) => {
     const { mapInstance } = get();
     if (!mapInstance) return;
-    mapInstance.panTo(latlng, { animate: true, duration: 0.4 });
+    
+    const target = Array.isArray(latlng) 
+      ? { lat: parseFloat(latlng[0]), lng: parseFloat(latlng[1]) } 
+      : latlng;
+      
+    mapInstance.panTo(target);
   },
 }));
 

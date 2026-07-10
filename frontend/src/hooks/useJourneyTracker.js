@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import L from 'leaflet';
+import { haversineDistance } from '../utils/geoUtils';
 import useNavigationStore from '../stores/navigationStore';
 import useRouteStore from '../stores/routeStore';
 import useUiStore from '../stores/uiStore';
@@ -27,18 +27,17 @@ const useJourneyTracker = () => {
 
     const checkProgress = async () => {
       // 1. Calculate straight-line distance to destination
-      const currentLatLng = L.latLng(userPosition[0], userPosition[1]);
       
       let destLatLng;
       if (destination.coordinates) {
         // [lat, lng] format for destination coordinates
-        destLatLng = L.latLng(destination.coordinates[0], destination.coordinates[1]);
+        destLatLng = [destination.coordinates[0], destination.coordinates[1]];
       } else if (destination.lat && destination.lng) {
-        destLatLng = L.latLng(destination.lat, destination.lng);
+        destLatLng = [destination.lat, destination.lng];
       }
       
       if (destLatLng) {
-        const distanceToDest = Math.round(currentLatLng.distanceTo(destLatLng));
+        const distanceToDest = Math.round(haversineDistance(userPosition, destLatLng));
         // Approximate time remaining at ~1.4 m/s (walking speed)
         const timeRemainingSecs = Math.round(distanceToDest / 1.4);
         

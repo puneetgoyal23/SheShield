@@ -1,9 +1,6 @@
-import { useMemo, useCallback, useEffect, useRef } from 'react';
-import { Marker, Popup, useMap } from 'react-leaflet';
-import MarkerClusterGroup from 'react-leaflet-cluster';
-import L from 'leaflet';
+import React, { useMemo, useCallback, useState, useEffect } from 'react';
+import { AdvancedMarker, InfoWindow, useMap } from '@vis.gl/react-google-maps';
 import { Shield, Navigation } from 'lucide-react';
-import { renderToStaticMarkup } from 'react-dom/server';
 import useSafetyStore from '../../../stores/safetyStore';
 import useRouteStore from '../../../stores/routeStore';
 import useNavigationStore from '../../../stores/navigationStore';
@@ -20,48 +17,6 @@ const icons = {
   default: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>`
 };
 
-const createCustomIcon = (type) => {
-  const svgString = icons[type] || icons.default;
-  return L.divIcon({
-    html: `<div class="safe-point-marker marker-${type}">${svgString}</div>`,
-    className: 'custom-safe-point-icon',
-    iconSize: [36, 36],
-    iconAnchor: [18, 18],
-    popupAnchor: [0, -18]
-  });
-};
-
-// Bypass Leaflet's aggressive stopPropagation by binding native DOM events directly to the button
-const NativeButton = ({ onClick, children, className }) => {
-  const ref = useRef(null);
-  
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    
-    const handler = (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      onClick(e);
-    };
-    
-    // Bind touchstart and mousedown to immediately catch the interaction before Leaflet suppresses it
-    el.addEventListener('mousedown', handler);
-    el.addEventListener('touchstart', handler, { passive: false });
-    
-    return () => {
-      el.removeEventListener('mousedown', handler);
-      el.removeEventListener('touchstart', handler);
-    };
-  }, [onClick]);
-  
-  return (
-    <button ref={ref} className={className} type="button">
-      {children}
-    </button>
-  );
-};
-
 const SafePointsLayer = () => {
   const map = useMap();
   const safePoints = useSafetyStore((s) => s.safePoints);
@@ -73,6 +28,8 @@ const SafePointsLayer = () => {
   const userPosition = useNavigationStore((s) => s.userPosition);
   const setAppMode = useUiStore((s) => s.setAppMode);
   const setBottomSheet = useUiStore((s) => s.setBottomSheet);
+  
+  const [activePopupId, setActivePopupId] = useState(null);
 
   const filteredPoints = useMemo(() => {
     if (!activeFilter) return safePoints;
@@ -80,7 +37,7 @@ const SafePointsLayer = () => {
   }, [safePoints, activeFilter]);
 
   const handleNavigate = useCallback((point) => {
-    map.closePopup();
+    setActivePopupId(null); // Close popup
 
     // 1. Verify user position exists to set origin
     if (!userPosition || userPosition.length !== 2) {
@@ -116,88 +73,85 @@ const SafePointsLayer = () => {
 
     setAppMode(APP_MODES.PLANNING);
     setBottomSheet(SHEET_STATES.HALF);
-  }, [map, userPosition, setOrigin, setDestination, setAppMode, setBottomSheet]);
+  }, [userPosition, setOrigin, setDestination, setAppMode, setBottomSheet]);
 
   // Auto-adjust map bounds when points are filtered
   useEffect(() => {
-    if (isSafePointsVisible && filteredPoints.length > 0 && userPosition) {
-      const bounds = L.latLngBounds([userPosition]);
-      filteredPoints.forEach(p => bounds.extend([p.lat, p.lng]));
-      
-      // Ensure the bounds aren't a single point (if no safe points found somehow)
-      if (bounds.isValid()) {
-        map.fitBounds(bounds, {
-          padding: [50, 50],
-          maxZoom: 15,
-          animate: true
-        });
+    if (isSafePointsVisible && filteredPoints.length > 0 && userPosition && map) {
+      const bounds = new window.google.maps.LatLngBounds();
+      if (Number.isFinite(userPosition[0]) && Number.isFinite(userPosition[1])) {
+        bounds.extend({ lat: userPosition[0], lng: userPosition[1] });
       }
+      filteredPoints.forEach(p => {
+        if (Number.isFinite(p.lat) && Number.isFinite(p.lng)) {
+          bounds.extend({ lat: p.lat, lng: p.lng });
+        }
+      });
+      
+      map.fitBounds(bounds, {
+        padding: { top: 50, right: 50, bottom: 50, left: 50 }
+      });
     }
   }, [isSafePointsVisible, filteredPoints, userPosition, map]);
 
   if (!isSafePointsVisible || !filteredPoints || filteredPoints.length === 0) return null;
 
   return (
-    <MarkerClusterGroup
-      chunkedLoading
-      maxClusterRadius={40}
-      showCoverageOnHover={false}
-      spiderfyOnMaxZoom={true}
-    >
+    <>
       {filteredPoints.map((point) => (
-        <Marker
-          key={point.id}
-          position={[point.lat, point.lng]}
-          icon={createCustomIcon(point.type)}
-          eventHandlers={{
-            popupopen: (e) => {
-              // Record exactly when the popup was opened natively by Leaflet
-              e.popup._lastOpenTime = Date.now();
-              
+        <React.Fragment key={point.id}>
+          <AdvancedMarker
+            position={{ lat: point.lat, lng: point.lng }}
+            onClick={() => {
+              setActivePopupId(point.id);
               // Hide bottom sheet when a Safe Point popup is active
               const currentSheetState = useUiStore.getState().bottomSheetState;
               if (currentSheetState !== SHEET_STATES.HIDDEN) {
                 setBottomSheet(SHEET_STATES.HIDDEN);
               }
-            },
-            click: (e) => {
-              const marker = e.target;
-              const popup = marker.getPopup();
-              if (popup && popup.isOpen()) {
-                const wasJustOpened = (Date.now() - (popup._lastOpenTime || 0)) < 200;
-                if (!wasJustOpened) {
-                  marker.closePopup();
-                }
-              }
-            }
-          }}
-        >
-          <Popup 
-            className="safe-point-popup"
-            autoPanPadding={[50, 50]}
-            closeButton={true}
+            }}
           >
-            <div className="safe-point-popup-content">
-              <h3>{point.name}</h3>
-              <div className="sp-header-row">
-                <p className="sp-type">{point.type.replace('_', ' ').toUpperCase()}</p>
-                {point.isOpen24h && <span className="sp-badge-24h">24/7 Open</span>}
-              </div>
-              <p className="sp-distance">{point.distance}m away</p>
-              {point.address && <p className="sp-address">{point.address}</p>}
+            <div 
+              className={`safe-point-marker marker-${point.type} custom-safe-point-icon`} 
+              dangerouslySetInnerHTML={{ __html: icons[point.type] || icons.default }}
+            />
+          </AdvancedMarker>
 
-              <NativeButton
-                className="sp-navigate-btn"
-                onClick={() => handleNavigate(point)}
-              >
-                <Navigation size={14} />
-                Start Navigation
-              </NativeButton>
-            </div>
-          </Popup>
-        </Marker>
+          {activePopupId === point.id && (
+            <InfoWindow
+              position={{ lat: point.lat, lng: point.lng }}
+              onCloseClick={() => setActivePopupId(null)}
+              pixelOffset={[0, -25]}
+              className="safe-point-popup"
+              headerDisabled={true}
+            >
+              <div className="safe-point-popup-content">
+                <h3>{point.name}</h3>
+                <div className="sp-header-row">
+                  <p className="sp-type">{point.type.replace('_', ' ').toUpperCase()}</p>
+                  {point.isOpen24h && <span className="sp-badge-24h">24/7 Open</span>}
+                </div>
+                <p className="sp-distance">{point.distance}m away</p>
+                {point.address && <p className="sp-address">{point.address}</p>}
+
+                <button
+                  className="sp-navigate-btn"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleNavigate(point);
+                  }}
+                  type="button"
+                >
+                  <Navigation size={14} />
+                  Start Navigation
+                </button>
+              </div>
+            </InfoWindow>
+          )}
+        </React.Fragment>
       ))}
-    </MarkerClusterGroup>
+    </>
   );
 };
 

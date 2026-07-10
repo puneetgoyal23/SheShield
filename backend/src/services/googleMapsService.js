@@ -62,6 +62,57 @@ export const geocodeAddress = async (address) => {
   }
 };
 
+const generateMockRoutes = (start, end) => {
+  // Generate 3 mock routes
+  // Route 1: Straight line (Normal/Fastest)
+  const route1Points = [
+    [start.latitude, start.longitude],
+    [end.latitude, end.longitude]
+  ];
+  
+  // Route 2: Deviation East (representing a route with more Police / Safe points)
+  const mid1Lat = (start.latitude + end.latitude) / 2 + 0.003;
+  const mid1Lng = (start.longitude + end.longitude) / 2 + 0.003;
+  const route2Points = [
+    [start.latitude, start.longitude],
+    [mid1Lat, mid1Lng],
+    [end.latitude, end.longitude]
+  ];
+
+  // Route 3: Deviation West (longer, representing an unsafe/dark road)
+  const mid2Lat = (start.latitude + end.latitude) / 2 - 0.004;
+  const mid2Lng = (start.longitude + end.longitude) / 2 - 0.004;
+  const route3Points = [
+    [start.latitude, start.longitude],
+    [mid2Lat, mid2Lng],
+    [end.latitude, end.longitude]
+  ];
+
+  return [
+    {
+      distanceMeters: 2500,
+      duration: "600s",
+      polyline: { encodedPolyline: encodePolyline(route1Points) },
+      routeLabel: "Fastest Route",
+      isMock: true
+    },
+    {
+      distanceMeters: 2900,
+      duration: "750s",
+      polyline: { encodedPolyline: encodePolyline(route2Points) },
+      routeLabel: "Safe Alternative Route",
+      isMock: true
+    },
+    {
+      distanceMeters: 3400,
+      duration: "900s",
+      polyline: { encodedPolyline: encodePolyline(route3Points) },
+      routeLabel: "Longer Path",
+      isMock: true
+    }
+  ];
+};
+
 /**
  * Fetches multiple routes from Google Routes API.
  */
@@ -72,52 +123,7 @@ export const getRoutes = async (origin, destination) => {
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
   if (!apiKey || apiKey === "YOUR_GOOGLE_MAPS_API_KEY") {
     console.warn("Google Maps API Key is missing. Using mock routes generator.");
-    
-    // Generate 3 mock routes
-    // Route 1: Straight line (Normal/Fastest)
-    const route1Points = [
-      [start.latitude, start.longitude],
-      [end.latitude, end.longitude]
-    ];
-    
-    // Route 2: Deviation East (representing a route with more Police / Safe points)
-    const mid1Lat = (start.latitude + end.latitude) / 2 + 0.003;
-    const mid1Lng = (start.longitude + end.longitude) / 2 + 0.003;
-    const route2Points = [
-      [start.latitude, start.longitude],
-      [mid1Lat, mid1Lng],
-      [end.latitude, end.longitude]
-    ];
-
-    // Route 3: Deviation West (longer, representing an unsafe/dark road)
-    const mid2Lat = (start.latitude + end.latitude) / 2 - 0.004;
-    const mid2Lng = (start.longitude + end.longitude) / 2 - 0.004;
-    const route3Points = [
-      [start.latitude, start.longitude],
-      [mid2Lat, mid2Lng],
-      [end.latitude, end.longitude]
-    ];
-
-    return [
-      {
-        distanceMeters: 2500,
-        duration: "600s",
-        polyline: { encodedPolyline: encodePolyline(route1Points) },
-        routeLabel: "Fastest Route"
-      },
-      {
-        distanceMeters: 2900,
-        duration: "750s",
-        polyline: { encodedPolyline: encodePolyline(route2Points) },
-        routeLabel: "Safe Alternative Route"
-      },
-      {
-        distanceMeters: 3400,
-        duration: "900s",
-        polyline: { encodedPolyline: encodePolyline(route3Points) },
-        routeLabel: "Longer Path"
-      }
-    ];
+    return generateMockRoutes(start, end);
   }
 
   try {
@@ -143,6 +149,10 @@ export const getRoutes = async (origin, destination) => {
 
     return response.data.routes;
   } catch (error) {
+    if (error.response?.status === 429) {
+      console.warn("Google Routes API Quota Exceeded (429). Falling back to mock routes.");
+      return generateMockRoutes(start, end);
+    }
     console.error("Google Routes API Error:", error.response?.data || error.message);
     throw error;
   }

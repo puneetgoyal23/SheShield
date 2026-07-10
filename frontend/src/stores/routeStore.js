@@ -10,6 +10,7 @@ const useRouteStore = create((set) => ({
   destination:      null,   /* { name, lat, lng } */
   routes:           [],     /* RouteOption[]       */
   activeRouteIndex: 0,
+  activeRoute:      null,   /* Persistent source of truth for navigation */
   isLoading:        false,
   error:            null,
 
@@ -17,7 +18,8 @@ const useRouteStore = create((set) => ({
   setOrigin:      (origin)      => set({ origin }),
   setDestination: (destination) => set({ destination }),
   setRoutes:      (routes)      => set({ routes, activeRouteIndex: 0, isLoading: false, error: null }),
-  setActiveRoute: (index)       => set({ activeRouteIndex: index }),
+  setActiveRouteIndex: (index)  => set({ activeRouteIndex: index }),
+  setActiveRoute: (route)       => set({ activeRoute: route }),
   setLoading:     (isLoading)   => set({ isLoading }),
   setError:       (error)       => set({ error, isLoading: false }),
 
@@ -27,6 +29,7 @@ const useRouteStore = create((set) => ({
       destination: null,
       routes: [],
       activeRouteIndex: 0,
+      activeRoute: null,
       isLoading: false,
       error: null,
     }),

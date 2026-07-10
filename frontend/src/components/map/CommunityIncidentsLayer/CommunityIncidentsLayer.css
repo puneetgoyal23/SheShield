@@ -77,43 +77,71 @@
   z-index: 1000;
 }
 
-/* ── Popup Design ── */
-.incident-popup .leaflet-popup-content-wrapper {
+/* ── Popup Design for Google Maps InfoWindow ── */
+.incident-popup .gm-style-iw-c {
+  padding: 0;
+  border-radius: var(--r-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+.incident-popup-content {
   background: var(--glass-bg-heavy);
   backdrop-filter: var(--glass-blur-heavy);
   -webkit-backdrop-filter: var(--glass-blur-heavy);
   border: 1px solid var(--glass-border-strong);
   border-radius: var(--r-lg);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
-  padding: 0;
-  overflow: hidden;
-}
-
-.incident-popup .leaflet-popup-tip {
-  background: var(--glass-bg-heavy);
-  border: 1px solid var(--glass-border-strong);
-  backdrop-filter: var(--glass-blur-heavy);
-}
-
-.incident-popup .leaflet-popup-close-button {
-  color: var(--color-text-secondary) !important;
-  font-size: 16px !important;
-  top: 8px !important;
-  right: 8px !important;
-}
-
-.incident-popup .leaflet-popup-close-button:hover {
-  color: var(--color-text-primary) !important;
-}
-
-/* ── Popup Content ── */
-.incident-popup-content {
   padding: var(--sp-4);
   display: flex;
   flex-direction: column;
   gap: var(--sp-2);
   min-width: 200px;
+  position: relative;
 }
+
+.incident-popup-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s, color 0.2s;
+  z-index: 10;
+}
+
+.incident-popup-close:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--color-text-primary);
+}
+
+.incident-popup .gm-style-iw-tc::after {
+  background: var(--glass-bg-heavy);
+  border: 1px solid var(--glass-border-strong);
+}
+
+.incident-popup .gm-ui-hover-effect {
+  top: 8px !important;
+  right: 8px !important;
+  background: transparent !important;
+}
+
+.incident-popup .gm-ui-hover-effect span {
+  background-color: var(--color-text-secondary) !important;
+  transition: background-color 0.2s;
+}
+
+.incident-popup .gm-ui-hover-effect:hover span {
+  background-color: var(--color-text-primary) !important;
+}
+
+/* ── Popup Content ── */
+/* Removed duplicate .incident-popup-content */
 
 .incident-popup-label {
   display: inline-block;
