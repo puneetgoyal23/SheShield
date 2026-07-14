@@ -130,6 +130,7 @@ const RouteCards = () => {
     setActiveRoute(activeRoute);
     
     // Switch UI to navigating immediately so the user isn’t blocked
+    useNavigationStore.getState().setIsDestinationReached(false);
     setAppMode(APP_MODES.NAVIGATING);
     setBottomSheet(SHEET_STATES.HIDDEN);
 

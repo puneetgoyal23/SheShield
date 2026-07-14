@@ -68,6 +68,7 @@ const SafePointsLayer = () => {
 
     // Show loading indicator implicitly by moving to NAVIGATING mode
     // The route store will handle loading state if needed
+    useNavigationStore.getState().setIsDestinationReached(false);
     useUiStore.getState().setAppMode(APP_MODES.NAVIGATING);
     setBottomSheet(SHEET_STATES.HIDDEN);
 

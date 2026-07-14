@@ -43,8 +43,10 @@ const useJourneyTracker = () => {
         
         updateETA(distanceToDest, timeRemainingSecs);
 
-        if (distanceToDest < 50) {
+        if (distanceToDest <= 20) {
           setIsDestinationReached(true);
+        } else {
+          setIsDestinationReached(false);
         }
       }
 
