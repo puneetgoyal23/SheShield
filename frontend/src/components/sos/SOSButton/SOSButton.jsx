@@ -7,7 +7,7 @@
  *   Countdown reaches 0 → SOS activates → backend notified
  */
 import React, { useEffect, useState } from 'react';
-import { Shield, MapPin, AlertTriangle, Users, MicOff, RefreshCw } from 'lucide-react';
+import { Shield, MapPin, AlertTriangle, Users, MicOff, RefreshCw, MessageCircle } from 'lucide-react';
 import useSosStore from '../../../stores/sosStore';
 import useNavigationStore from '../../../stores/navigationStore';
 import axiosInstance from '../../../services/api/axiosInstance';
@@ -82,6 +82,19 @@ const SOSActiveScreen = ({ onResolve, apiStatus, userPosition, onRetry, contacts
     return () => clearInterval(interval);
   }, [triggeredAt]);
 
+  const getWhatsAppLink = (contact) => {
+    const lat = userPosition ? userPosition[0] : null;
+    const lng = userPosition ? userPosition[1] : null;
+    const mapsLink = lat && lng ? `https://www.google.com/maps?q=${lat},${lng}` : 'location unavailable';
+    const msg = `EMERGENCY SOS! I need help immediately. My location: ${mapsLink}`;
+    
+    // Basic formatting: ensure only digits, default to India (+91) if no country code
+    const phone = contact.phone.replace(/[^\d+]/g, '');
+    const finalPhone = phone.startsWith('+') ? phone.substring(1) : (phone.startsWith('91') ? phone : `91${phone}`);
+    
+    return `https://wa.me/${finalPhone}?text=${encodeURIComponent(msg)}`;
+  };
+
   return (
     <div className="sos-active-panel anim-slide-up" role="alertdialog" aria-modal="true">
       <div className="sos-active-header">
@@ -115,6 +128,26 @@ const SOSActiveScreen = ({ onResolve, apiStatus, userPosition, onRetry, contacts
           <Users size={16} />
           <span>Contacts: {apiStatus === 'success' ? (contactsAlerted?.length ? `App Alerts Sent (${contactsAlerted.length})` : 'None Configured') : 'Pending'}</span>
         </div>
+
+        {apiStatus === 'success' && contactsAlerted?.length > 0 && (
+          <div className="sos-whatsapp-section">
+            <p className="sos-wa-title">Manual WhatsApp Share:</p>
+            <div className="sos-wa-list">
+              {contactsAlerted.map((contact, idx) => (
+                <a 
+                  key={idx}
+                  href={getWhatsAppLink(contact)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="sos-wa-btn"
+                >
+                  <MessageCircle size={14} />
+                  <span>{contact.name}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="sos-status-item muted">
           <MicOff size={16} />
