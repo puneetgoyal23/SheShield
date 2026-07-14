@@ -4,6 +4,7 @@ import useRouteStore from '../../../stores/routeStore';
 import useUiStore from '../../../stores/uiStore';
 import { APP_MODES } from '../../../constants/appConstants';
 import { routingApi } from '../../../services/api/routingApi';
+import useNavigationStore from '../../../stores/navigationStore';
 import './RouteLayer.css';
 
 const GooglePolyline = ({ positions, pathOptions, eventHandlers }) => {
