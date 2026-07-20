@@ -198,7 +198,7 @@
 
 .sos-active-panel {
   position: fixed;
-  bottom: var(--sp-4);
+  bottom: calc(var(--bottom-nav-height, 60px) + var(--sp-4));
   left: 50%;
   background: var(--glass-bg-heavy);
   backdrop-filter: var(--glass-blur-heavy);
@@ -208,6 +208,8 @@
   padding: var(--sp-4);
   width: calc(100vw - 32px);
   max-width: none;
+  max-height: calc(100vh - var(--bottom-nav-height, 60px) - var(--sp-8));
+  overflow-y: auto;
   box-shadow: var(--shadow-xl), var(--shadow-glow-danger);
   z-index: var(--z-modal);
   display: flex;

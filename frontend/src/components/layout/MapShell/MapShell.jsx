@@ -22,8 +22,6 @@ import AlertModal      from '../../alert/AlertModal/AlertModal';
 import ReportButton    from '../../report/ReportButton/ReportButton';
 import ReportModal     from '../../report/ReportModal/ReportModal';
 import LiveReportsFeed from '../../report/LiveReportsFeed/LiveReportsFeed';
-import EmergencyContactsButton from '../../contacts/EmergencyContactsButton/EmergencyContactsButton';
-import EmergencyContactsModal from '../../contacts/EmergencyContactsModal/EmergencyContactsModal';
 import FindSafeSpotButton from '../../safety/FindSafeSpotButton/FindSafeSpotButton';
 
 import useGeolocation    from '../../../hooks/useGeolocation';
@@ -175,7 +173,6 @@ const MapShell = () => {
           {/* Search */}
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <SearchBar />
-            <EmergencyContactsButton />
           </div>
           
           {/* ── Live Reports Feed ── */}
@@ -217,7 +214,6 @@ const MapShell = () => {
       {/* ── Modals ── */}
       <AlertModal />
       <ReportModal />
-      <EmergencyContactsModal />
 
     </div>
   );

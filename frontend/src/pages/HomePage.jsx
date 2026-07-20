@@ -262,10 +262,10 @@ const HomePage = () => {
   const contacts       = useContactStore((s) => s.contacts);
   const beginCountdown = useSosStore((s) => s.beginCountdown);
 
-  const userName = useMemo(
-    () => profile?.name || profile?.email?.split('@')[0] || null,
-    [profile]
-  );
+  const userName = useMemo(() => {
+    const raw = profile?.name || profile?.email?.split('@')[0] || null;
+    return raw ? raw.charAt(0).toUpperCase() + raw.slice(1) : null;
+  }, [profile]);
 
   const handleNavigate      = () => navigate('/app/navigation');
   const handleSOS           = () => { navigate('/app/navigation'); setTimeout(() => beginCountdown(), 100); };
