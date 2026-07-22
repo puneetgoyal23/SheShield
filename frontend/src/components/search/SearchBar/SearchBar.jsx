@@ -3,11 +3,34 @@ import { Search, X, Crosshair, ArrowUpDown } from 'lucide-react';
 import useUiStore from '../../../stores/uiStore';
 import useRouteStore from '../../../stores/routeStore';
 import useNavigationStore from '../../../stores/navigationStore';
+import useTravelModeStore, { TRAVEL_MODES } from '../../../stores/travelModeStore';
 import { APP_MODES, SHEET_STATES } from '../../../constants/appConstants';
 import { useDebounce } from '../../../hooks/useDebounce';
 import { useGeocoding } from '../../../hooks/useGeocoding';
 import SearchSuggestions from '../SearchSuggestions/SearchSuggestions';
 import './SearchBar.css';
+
+/* ── Travel Mode Segmented Control ── */
+const TravelModeSelector = () => {
+  const mode    = useTravelModeStore((s) => s.mode);
+  const setMode = useTravelModeStore((s) => s.setMode);
+  return (
+    <div className="sb-mode-selector" role="group" aria-label="Travel mode">
+      {Object.values(TRAVEL_MODES).map(({ id, label, emoji }) => (
+        <button
+          key={id}
+          className={`sb-mode-btn ${mode === id ? 'sb-mode-btn--active' : ''}`}
+          onClick={() => setMode(id)}
+          aria-pressed={mode === id}
+          aria-label={label}
+        >
+          <span className="sb-mode-emoji">{emoji}</span>
+          <span className="sb-mode-label">{label}</span>
+        </button>
+      ))}
+    </div>
+  );
+};
 
 const SearchBar = () => {
   const [pickupQuery, setPickupQuery] = useState('');
@@ -279,6 +302,12 @@ const SearchBar = () => {
             </button>
           )}
         </div>
+
+        {/* ── Divider ── */}
+        <div className="search-divider-horizontal" />
+
+        {/* ── Travel Mode Selector ── */}
+        <TravelModeSelector />
 
       </div>
 

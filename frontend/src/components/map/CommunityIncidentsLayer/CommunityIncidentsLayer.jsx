@@ -53,6 +53,15 @@ const CommunityIncidentsLayer = () => {
   const groupedReports = useMemo(() => {
     const groups = [];
     reports.forEach(report => {
+      // Skip any report that doesn't have a valid [lat, lng] position
+      if (
+        !report.position ||
+        !Array.isArray(report.position) ||
+        report.position.length < 2 ||
+        report.position[0] == null ||
+        report.position[1] == null
+      ) return;
+
       // Group reports that are essentially at the exact same location (< 0.0001 deg is ~11 meters)
       const existingGroup = groups.find(g => {
         const dLat = Math.abs(g.lat - report.position[0]);

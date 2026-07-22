@@ -4,6 +4,7 @@ import { haversineDistance } from '../../../utils/geoUtils';
 import useRouteStore from '../../../stores/routeStore';
 import useUiStore from '../../../stores/uiStore';
 import useNavigationStore from '../../../stores/navigationStore';
+import useTravelModeStore from '../../../stores/travelModeStore';
 import { APP_MODES, SHEET_STATES } from '../../../constants/appConstants';
 import { ShieldAlert, ShieldCheck, Shield, ChevronDown, ChevronUp, AlertTriangle } from 'lucide-react';
 import axiosInstance from '../../../services/api/axiosInstance';
@@ -16,7 +17,7 @@ const getSafetyLabel = (score) => {
   return 'Dangerous 🔴';
 };
 
-const RouteCard = ({ route, isActive, isExpanded, onToggleExpand, onClick, onStartNavigation }) => {
+const RouteCard = ({ route, isActive, isExpanded, onToggleExpand, onClick, onStartNavigation, durationMultiplier }) => {
   const [isSafetyExpanded, setIsSafetyExpanded] = useState(false);
 
   const isSafe = route.safetyScore >= 80;
@@ -24,6 +25,9 @@ const RouteCard = ({ route, isActive, isExpanded, onToggleExpand, onClick, onSta
   
   const scoreClass = isSafe ? 'score-safe' : (isWarning ? 'score-warning' : 'score-danger');
   const Icon = isSafe ? ShieldCheck : (isWarning ? Shield : ShieldAlert);
+
+  // Apply travel-mode multiplier at display time only; raw data stays untouched
+  const displayDuration = Math.round((route.duration ?? 0) * (durationMultiplier ?? 1));
 
   return (
     <div 
@@ -43,7 +47,7 @@ const RouteCard = ({ route, isActive, isExpanded, onToggleExpand, onClick, onSta
         <div className="route-card-title">
           <span className="route-card-label">{route.label}</span>
           <div className="route-card-metrics">
-            <span className="route-card-time-compact">{formatDuration(route.duration)}</span>
+            <span className="route-card-time-compact">{formatDuration(displayDuration)}</span>
             <span className="route-card-dot">•</span>
             <span className="route-card-subtitle">{formatDistance(route.distance)}</span>
           </div>
@@ -125,6 +129,10 @@ const RouteCards = () => {
 
   const setOrigin = useRouteStore((s) => s.setOrigin);
   const userPosition = useNavigationStore((s) => s.userPosition);
+
+  // Travel mode multiplier (live, reacts to selector changes)
+  const getMultiplier = useTravelModeStore((s) => s.getMultiplier);
+  const durationMultiplier = getMultiplier();
   
   const [expandedIndex, setExpandedIndex] = useState(0);
   const [showPickupModal, setShowPickupModal] = useState(false);
@@ -219,6 +227,7 @@ const RouteCards = () => {
             route={route}
             isActive={index === activeRouteIndex}
             isExpanded={index === expandedIndex}
+            durationMultiplier={durationMultiplier}
             onToggleExpand={(e) => {
               e.stopPropagation();
               setExpandedIndex(expandedIndex === index ? null : index);
