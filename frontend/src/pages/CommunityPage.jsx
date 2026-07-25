@@ -31,7 +31,7 @@ const PRIVACY_META = {
 // Extracted from local storage or auth context
 const getUserId = () => {
   try {
-    const user = JSON.parse(localStorage.getItem('ss_user'));
+    const user = JSON.parse(localStorage.getItem('ss_user_profile'));
     return user?._id || user?.id || 'mock_user_id';
   } catch(e) { return 'mock_user_id'; }
 };
@@ -270,7 +270,7 @@ const ChatSection = ({ room }) => {
   const [input, setInput] = useState('');
   const bottomRef = useRef(null);
   const userId = getUserId();
-  const userName = JSON.parse(localStorage.getItem('ss_user'))?.name || 'User';
+  const userName = JSON.parse(localStorage.getItem('ss_user_profile'))?.name || 'User';
 
   useEffect(() => {
     const fetchMessages = async () => {
