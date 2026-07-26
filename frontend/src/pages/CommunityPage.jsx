@@ -277,7 +277,7 @@ const ChatSection = ({ room }) => {
       try {
         const data = await roomApi.getRoomMessages(room.roomId);
         setMessages(data || []);
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+        setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
       } catch (e) { console.error("Could not fetch messages", e); }
     };
     fetchMessages();
@@ -288,7 +288,7 @@ const ChatSection = ({ room }) => {
     socket.on('receive-message', (data) => {
       if (data.roomId === room.roomId) {
         setMessages(prev => [...prev, data]);
-        setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+        setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
       }
     });
 
@@ -342,7 +342,12 @@ const ChatSection = ({ room }) => {
             placeholder="Type a message…"
             value={input}
             onChange={e => setInput(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && send()}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                send();
+              }
+            }}
           />
           <button className="sr-chat-send" onClick={send} aria-label="Send">
             <Send size={16} />
