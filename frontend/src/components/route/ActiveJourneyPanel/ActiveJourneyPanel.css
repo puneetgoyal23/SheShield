@@ -128,8 +128,8 @@
 
 .status-alert-mode {
   color: var(--color-primary);
-  background: rgba(233, 30, 140, 0.1);
-  border: 1px solid rgba(233, 30, 140, 0.2);
+  background: var(--cp-a10);
+  border: 1px solid var(--cp-a20);
 }
 
 .status-deviated {
@@ -183,15 +183,15 @@
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
   color: var(--color-primary);
-  background: rgba(233, 30, 140, 0.08);
-  border: 1px solid rgba(233, 30, 140, 0.2);
+  background: var(--cp-a10);
+  border: 1px solid var(--cp-a20);
   cursor: pointer;
   transition: all var(--transition-fast);
 }
 
 .journey-safepoint-btn:hover {
-  background: rgba(233, 30, 140, 0.15);
-  border-color: rgba(233, 30, 140, 0.4);
+  background: var(--cp-a15);
+  border-color: var(--cp-a40);
 }
 
 .journey-safepoint-btn:active {

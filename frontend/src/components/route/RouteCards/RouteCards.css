@@ -198,13 +198,13 @@
   border-radius: var(--r-full);
   font-weight: var(--weight-bold);
   font-size: var(--text-sm);
-  box-shadow: 0 4px 16px rgba(233, 30, 140, 0.4);
+  box-shadow: 0 4px 16px var(--cp-a40);
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .route-start-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(233, 30, 140, 0.5);
+  box-shadow: 0 6px 20px var(--cp-a50);
 }
 
 .route-start-btn:active {

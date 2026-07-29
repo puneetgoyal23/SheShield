@@ -83,7 +83,7 @@
 .alert-btn-return {
   background: var(--color-primary);
   color: white;
-  box-shadow: 0 4px 12px rgba(233, 30, 140, 0.3);
+  box-shadow: 0 4px 12px var(--cp-a30);
 }
 
 .alert-btn-return:hover {
@@ -117,13 +117,13 @@
   top: 40px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(233, 30, 140, 0.9);
+  background: var(--cp-a90);
   color: white;
   padding: 12px 24px;
   border-radius: var(--r-full);
   font-size: var(--text-sm);
   font-weight: var(--weight-bold);
-  box-shadow: 0 4px 15px rgba(233, 30, 140, 0.4);
+  box-shadow: 0 4px 15px var(--cp-a40);
   z-index: 10001;
   display: flex;
   align-items: center;

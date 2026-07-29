@@ -230,7 +230,7 @@
 .sb-mode-btn--active {
   background: var(--color-primary-alpha);
   color: var(--color-primary);
-  box-shadow: inset 0 0 0 1px rgba(233, 30, 140, 0.35);
+  box-shadow: inset 0 0 0 1px var(--cp-a35);
 }
 
 .sb-mode-emoji {

@@ -84,14 +84,14 @@
 }
 
 .app-brand-icon {
-  filter: drop-shadow(0 0 6px rgba(233, 30, 140, 0.6));
+  filter: drop-shadow(0 0 6px var(--cp-a60));
 }
 
 .app-brand-name {
   font-family: var(--font-display);
   font-size: var(--text-base);
   font-weight: var(--weight-extrabold);
-  background: linear-gradient(120deg, #E91E8C 0%, #F48FB1 100%);
+  background: linear-gradient(120deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

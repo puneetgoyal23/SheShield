@@ -63,10 +63,10 @@
   font-weight: var(--weight-bold);
   cursor: pointer;
   flex-shrink: 0;
-  box-shadow: 0 4px 16px rgba(233, 30, 140, 0.35);
+  box-shadow: 0 4px 16px var(--cp-a35);
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
-.cp-report-fab:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(233, 30, 140, 0.48); }
+.cp-report-fab:hover { transform: translateY(-1px); box-shadow: 0 6px 22px var(--cp-a45); }
 .cp-report-fab:active { transform: scale(0.96); }
 
 /* ── Search bar ── */
@@ -97,8 +97,8 @@
 }
 .sr-search-input::placeholder { color: var(--color-text-muted); }
 .sr-search-input:focus {
-  border-color: rgba(233, 30, 140, 0.45);
-  box-shadow: 0 0 0 3px rgba(233, 30, 140, 0.10);
+  border-color: var(--cp-a45);
+  box-shadow: 0 0 0 3px var(--cp-a10);
 }
 
 /* ── Quick-action row (All Rooms / My Rooms) ── */
@@ -124,7 +124,7 @@
 }
 .sr-action-btn--active {
   background: var(--color-primary-alpha);
-  border-color: rgba(233, 30, 140, 0.40);
+  border-color: var(--cp-a40);
   color: var(--color-primary);
 }
 .sr-badge-dot {
@@ -204,7 +204,7 @@
 .sr-room-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
-  border-color: rgba(233, 30, 140, 0.25);
+  border-color: var(--cp-a25);
 }
 .sr-room-card:active { transform: scale(0.985); }
 
@@ -277,7 +277,7 @@
   font-weight: var(--weight-semibold);
   color: var(--color-text-secondary);
   background: var(--color-primary-alpha);
-  border: 1px solid rgba(233, 30, 140, 0.22);
+  border: 1px solid var(--cp-a22);
   border-radius: var(--r-full);
   padding: 3px 9px;
 }
@@ -340,11 +340,11 @@
   font-size: var(--text-sm);
   font-weight: var(--weight-bold);
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(233, 30, 140, 0.30);
+  box-shadow: 0 4px 16px var(--cp-a30);
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
   font-family: var(--font-sans);
 }
-.sr-join-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(233, 30, 140, 0.45); }
+.sr-join-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 22px var(--cp-a45); }
 .sr-join-btn:active { transform: scale(0.97); }
 
 /* ── Empty state (shared) ── */
@@ -455,7 +455,7 @@
   transition: border-color var(--transition-fast);
 }
 .sr-input::placeholder { color: var(--color-text-muted); }
-.sr-input:focus { border-color: rgba(233, 30, 140, 0.45); }
+.sr-input:focus { border-color: var(--cp-a45); }
 
 .sr-textarea {
   width: 100%;
@@ -473,7 +473,7 @@
   transition: border-color var(--transition-fast);
 }
 .sr-textarea::placeholder { color: var(--color-text-muted); }
-.sr-textarea:focus { border-color: rgba(233, 30, 140, 0.45); }
+.sr-textarea:focus { border-color: var(--cp-a45); }
 
 /* Chip group */
 .sr-chip-group {
@@ -495,7 +495,7 @@
 }
 .sr-chip--active {
   background: var(--color-primary-alpha);
-  border-color: rgba(233, 30, 140, 0.45);
+  border-color: var(--cp-a45);
   color: var(--color-primary);
 }
 
@@ -522,7 +522,7 @@
 }
 .sr-privacy-btn--active {
   background: var(--color-primary-alpha);
-  border-color: rgba(233, 30, 140, 0.45);
+  border-color: var(--cp-a45);
   color: var(--color-primary);
 }
 
@@ -541,11 +541,11 @@
   font-size: var(--text-base);
   font-weight: var(--weight-bold);
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(233, 30, 140, 0.35);
+  box-shadow: 0 4px 20px var(--cp-a35);
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
   font-family: var(--font-sans);
 }
-.sr-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(233, 30, 140, 0.50); }
+.sr-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 28px var(--cp-a50); }
 .sr-submit-btn:active { transform: scale(0.97); }
 
 /* ══════════════════════════════════════════════
@@ -725,7 +725,7 @@
   transition: border-color var(--transition-fast);
 }
 .sr-chat-input::placeholder { color: var(--color-text-muted); }
-.sr-chat-input:focus { border-color: rgba(233, 30, 140, 0.45); }
+.sr-chat-input:focus { border-color: var(--cp-a45); }
 
 .sr-chat-send {
   display: flex;
@@ -739,7 +739,7 @@
   color: #fff;
   cursor: pointer;
   flex-shrink: 0;
-  box-shadow: 0 4px 14px rgba(233, 30, 140, 0.35);
+  box-shadow: 0 4px 14px var(--cp-a35);
   transition: transform var(--transition-fast);
 }
 .sr-chat-send:hover { transform: scale(1.06); }
@@ -1017,7 +1017,7 @@
   font-weight: var(--weight-semibold);
   color: var(--color-primary);
   background: var(--color-primary-alpha);
-  border: 1px solid rgba(233, 30, 140, 0.22);
+  border: 1px solid var(--cp-a22);
   border-radius: var(--r-full);
   padding: 4px 10px;
 }

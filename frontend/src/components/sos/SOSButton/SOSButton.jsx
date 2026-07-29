@@ -307,7 +307,7 @@ const SOSButton = () => {
         <div className="sos-overlay" role="alertdialog" aria-modal="true">
           <div className="sos-overlay-card anim-scale-in-spring">
             <div className="sos-ring-container" style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <AlertTriangle size={48} color="#e91e63" />
+              <AlertTriangle size={48} style={{ color: 'var(--color-primary)' }} />
             </div>
             <p className="sos-overlay-title">Emergency Alert Ready</p>
             <p className="sos-overlay-subtitle">

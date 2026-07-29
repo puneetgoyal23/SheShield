@@ -1,0 +1,53 @@
+/* ══════════════════════════════════════════════
+   SheShield Theme System
+   Applied via [data-theme] attribute on <html>.
+   Only accent / brand colours change.
+   Background, surfaces, text, safety colours stay fixed.
+   ══════════════════════════════════════════════ */
+
+/* ── Theme 1: SheShield Pink (default) ──────── */
+:root,
+[data-theme="pink"] {
+  --color-primary:       #FF2D7A;
+  --color-primary-dark:  #CC1A5E;
+  --color-primary-light: #FF5FA2;
+  --color-primary-alpha: rgba(255, 45, 122, 0.14);
+  --color-primary-glow:  rgba(255, 45, 122, 0.45);
+}
+
+/* ── Theme 2: Aurora Purple ──────────────────── */
+[data-theme="purple"] {
+  --color-primary:       #7C4DFF;
+  --color-primary-dark:  #5E35CC;
+  --color-primary-light: #9D6BFF;
+  --color-primary-alpha: rgba(124, 77, 255, 0.14);
+  --color-primary-glow:  rgba(124, 77, 255, 0.45);
+}
+
+/* ── Theme 3: Emerald ────────────────────────── */
+[data-theme="emerald"] {
+  --color-primary:       #00C98D;
+  --color-primary-dark:  #00A372;
+  --color-primary-light: #38E6B5;
+  --color-primary-alpha: rgba(0, 201, 141, 0.14);
+  --color-primary-glow:  rgba(0, 201, 141, 0.45);
+}
+
+/* ── Global transition on every accent-coloured property ── */
+*,
+*::before,
+*::after {
+  transition: var(--theme-transition);
+}
+
+/* Exception: animations that shouldn't be affected */
+.anim-slide-up,
+.anim-slide-down,
+.anim-fade-in,
+.anim-scale-in-spring,
+.sos-fab,
+.sos-fab-ring,
+.sos-ring-progress {
+  /* Let existing transitions win for these classes */
+  transition: inherit;
+}

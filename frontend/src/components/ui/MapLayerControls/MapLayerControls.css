@@ -29,7 +29,7 @@
 
 .layer-control-btn.active {
   color: var(--color-primary);
-  filter: drop-shadow(0 0 8px rgba(233, 30, 140, 0.4));
+  filter: drop-shadow(0 0 8px var(--cp-a40));
 }
 
 .layer-control-divider {

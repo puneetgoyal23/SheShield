@@ -36,7 +36,7 @@
   height: 44px;
   border-radius: var(--r-md);
   background: var(--color-primary-alpha);
-  border: 1px solid rgba(233, 30, 140, 0.28);
+  border: 1px solid var(--cp-a28);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -173,7 +173,7 @@
   transition: transform var(--transition-fast), border-color var(--transition-fast);
   text-align: center;
 }
-.sh-quick-btn:hover { transform: translateY(-2px); border-color: rgba(233, 30, 140, 0.35); }
+.sh-quick-btn:hover { transform: translateY(-2px); border-color: var(--cp-a35); }
 .sh-quick-btn:active { transform: scale(0.95); }
 
 .sh-quick-icon {
@@ -246,7 +246,7 @@
   height: 36px;
   border-radius: 50%;
   background: var(--color-primary-alpha);
-  border: 1px solid rgba(233, 30, 140, 0.28);
+  border: 1px solid var(--cp-a28);
   color: var(--color-primary);
   display: flex;
   align-items: center;
@@ -256,8 +256,8 @@
   transition: background var(--transition-fast), box-shadow var(--transition-fast);
 }
 .sh-resource-call-btn:hover {
-  background: rgba(233, 30, 140, 0.22);
-  box-shadow: 0 0 12px rgba(233, 30, 140, 0.30);
+  background: var(--cp-a22);
+  box-shadow: 0 0 12px var(--cp-a30);
 }
 
 /* ── Safety tips ── */

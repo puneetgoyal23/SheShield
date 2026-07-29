@@ -166,7 +166,7 @@ const MapShell = () => {
         <div className="top-controls-wrap">
           {/* App brand */}
           <div className="app-brand" aria-label="SheShield">
-            <Shield size={24} color="#ff2d55" className="app-brand-icon" />
+            <Shield size={24} className="app-brand-icon" style={{ color: 'var(--color-primary)' }} />
             <span className="app-brand-name">SheShield</span>
           </div>
 

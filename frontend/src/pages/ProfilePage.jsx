@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import useUserStore    from '../stores/userStore';
 import useContactStore from '../stores/contactStore';
+import useThemeStore   from '../stores/themeStore';
 import EmergencyContactsModal from '../components/contacts/EmergencyContactsModal/EmergencyContactsModal';
 import './ProfilePage.css';
 
@@ -103,13 +104,13 @@ const PrivacyPanel = ({ onClose }) => (
 
 /* 3. Appearance */
 const THEMES = [
-  { id: 'pink',   label: 'Default Pink', color: '#E91E8C' },
-  { id: 'purple', label: 'Purple',       color: '#7C4DFF' },
-  { id: 'blue',   label: 'Blue',         color: '#1E88E5' },
+  { id: 'pink',    label: 'SheShield Pink', color: '#FF2D7A' },
+  { id: 'purple',  label: 'Aurora Purple',  color: '#7C4DFF' },
+  { id: 'emerald', label: 'Emerald',        color: '#00C98D' },
 ];
 const AppearancePanel = ({ onClose }) => {
-  const [theme, setTheme] = useState(() => loadPref('app_theme', 'pink'));
-  const pickTheme = (id) => { setTheme(id); savePref('app_theme', id); };
+  const theme    = useThemeStore((s) => s.theme);
+  const setTheme = useThemeStore((s) => s.setTheme);
   return (
     <SettingsOverlay title="Appearance" onClose={onClose}>
       {/* Dark Mode always on */}
@@ -131,7 +132,7 @@ const AppearancePanel = ({ onClose }) => {
             <button
               key={t.id}
               className={`pp-theme-btn ${theme === t.id ? 'pp-theme-btn--active' : ''}`}
-              onClick={() => pickTheme(t.id)}
+              onClick={() => setTheme(t.id)}
               style={{ '--theme-color': t.color }}
             >
               <div className="pp-theme-swatch" />

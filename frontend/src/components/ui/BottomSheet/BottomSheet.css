@@ -129,7 +129,7 @@
   align-items: center;
   justify-content: center;
   color: var(--color-primary);
-  border: 1px solid rgba(233, 30, 140, 0.20);
+  border: 1px solid var(--cp-a20);
 }
 
 .bs-empty-text {

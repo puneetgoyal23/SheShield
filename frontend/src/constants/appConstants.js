@@ -27,7 +27,7 @@ export const SAFE_POINT_TYPES = {
   BUS_STAND:   { id: 'bus_stand',   label: 'Bus Stand',         emoji: '🚌', color: '#F44336', alwaysOpen: false },
   PHARMACY:    { id: 'pharmacy',    label: '24x7 Pharmacy',     emoji: '💊', color: '#00BCD4', alwaysOpen: true  },
   HOTEL:       { id: 'hotel',       label: 'Verified Hotel',    emoji: '🏨', color: '#607D8B', alwaysOpen: true  },
-  WOMENS_DESK: { id: 'womens_desk', label: "Women's Help Desk", emoji: '👩', color: '#E91E8C', alwaysOpen: true  },
+  WOMENS_DESK: { id: 'womens_desk', label: "Women's Help Desk", emoji: '👩', color: 'var(--color-primary)', alwaysOpen: true  },
 };
 
 /* ── Time of Day Slots ── */

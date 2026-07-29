@@ -23,7 +23,7 @@ const PRIVACY_OPTIONS   = [
 ];
 
 const PRIVACY_META = {
-  women_only:    { label: 'Women Only', icon: Shield,    color: '#E91E8C' },
+  women_only:    { label: 'Women Only', icon: Shield,    color: 'var(--color-primary)' },
   everyone:      { label: 'Everyone',   icon: Globe,     color: '#42A5F5' },
   verified_only: { label: 'Verified',   icon: UserCheck, color: '#AB47BC' },
 };

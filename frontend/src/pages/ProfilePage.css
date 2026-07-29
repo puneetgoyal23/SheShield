@@ -64,38 +64,38 @@
   font-weight: var(--weight-bold);
   color: var(--color-primary);
   background: var(--color-primary-alpha);
-  border: 1px solid rgba(233, 30, 140, 0.28);
+  border: 1px solid var(--cp-a28);
   border-radius: var(--r-full);
   padding: 4px var(--sp-3);
   cursor: pointer;
   transition: background var(--transition-fast);
 }
-.pp-section-action:hover { background: rgba(233, 30, 140, 0.20); }
+.pp-section-action:hover { background: var(--cp-a20); }
 
 /* ── 1. User Card ── */
 .pp-user-card {
   position: relative;
   background: linear-gradient(
     135deg,
-    rgba(233, 30, 140, 0.16) 0%,
+    var(--cp-a16) 0%,
     rgba(8, 8, 18, 0.95) 60%,
-    rgba(233, 30, 140, 0.06) 100%
+    var(--cp-a05) 100%
   );
-  border: 1px solid rgba(233, 30, 140, 0.28);
+  border: 1px solid var(--cp-a28);
   border-radius: var(--r-2xl);
   padding: var(--sp-6) var(--sp-5);
   min-height: 130px;
   display: flex;
   align-items: center;
   overflow: hidden;
-  box-shadow: 0 0 40px rgba(233, 30, 140, 0.10), var(--shadow-md);
+  box-shadow: 0 0 40px var(--cp-a10), var(--shadow-md);
 }
 .pp-user-bg-glow {
   position: absolute;
   top: -60px; right: -60px;
   width: 200px; height: 200px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(233, 30, 140, 0.20) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--cp-a20) 0%, transparent 70%);
   pointer-events: none;
 }
 .pp-user-content {
@@ -121,7 +121,7 @@
   font-weight: var(--weight-extrabold);
   color: #fff;
   flex-shrink: 0;
-  box-shadow: 0 0 24px rgba(233, 30, 140, 0.40);
+  box-shadow: 0 0 24px var(--cp-a40);
   border: 2px solid rgba(255, 255, 255, 0.15);
 }
 
@@ -189,14 +189,14 @@
   padding: 7px var(--sp-4);
   border-radius: var(--r-full);
   background: var(--color-primary-alpha);
-  border: 1px solid rgba(233, 30, 140, 0.30);
+  border: 1px solid var(--cp-a30);
   color: var(--color-primary);
   font-size: var(--text-xs);
   font-weight: var(--weight-bold);
   cursor: pointer;
   transition: background var(--transition-fast);
 }
-.pp-add-contact-btn:hover { background: rgba(233, 30, 140, 0.20); }
+.pp-add-contact-btn:hover { background: var(--cp-a20); }
 
 .pp-contacts-list {
   display: flex;
@@ -217,7 +217,7 @@
   height: 38px;
   border-radius: 50%;
   background: var(--color-primary-alpha);
-  border: 1px solid rgba(233, 30, 140, 0.25);
+  border: 1px solid var(--cp-a25);
   color: var(--color-primary);
   display: flex;
   align-items: center;
@@ -249,7 +249,7 @@
   height: 34px;
   border-radius: 50%;
   background: var(--color-primary-alpha);
-  border: 1px solid rgba(233, 30, 140, 0.25);
+  border: 1px solid var(--cp-a25);
   color: var(--color-primary);
   display: flex;
   align-items: center;
@@ -258,7 +258,7 @@
   flex-shrink: 0;
   transition: background var(--transition-fast);
 }
-.pp-contact-call-btn:hover { background: rgba(233, 30, 140, 0.20); }
+.pp-contact-call-btn:hover { background: var(--cp-a20); }
 
 /* ── 3. Settings ── */
 .pp-settings-list {
@@ -635,7 +635,7 @@
   align-items: center;
   justify-content: center;
   color: #fff;
-  box-shadow: 0 8px 24px rgba(233, 30, 140, 0.35);
+  box-shadow: 0 8px 24px var(--cp-a35);
 }
 .pp-about-app-name {
   font-family: var(--font-display);

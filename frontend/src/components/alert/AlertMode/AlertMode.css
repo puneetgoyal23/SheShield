@@ -26,10 +26,10 @@
 }
 
 .alert-mode-pill.active {
-  background: rgba(233, 30, 140, 0.15);
-  border-color: rgba(233, 30, 140, 0.4);
+  background: var(--cp-a15);
+  border-color: var(--cp-a40);
   color: #ffb6c1; /* lighter pink text for contrast */
-  box-shadow: 0 4px 15px rgba(233, 30, 140, 0.2);
+  box-shadow: 0 4px 15px var(--cp-a20);
 }
 
 .alert-mode-icon {

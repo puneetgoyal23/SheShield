@@ -21,7 +21,7 @@
   transform: translate(-50%, -50%);
   width: 150vw;
   height: 150vw;
-  background: radial-gradient(circle, rgba(233, 30, 140, 0.12) 0%, rgba(10, 10, 15, 0) 65%);
+  background: radial-gradient(circle, var(--cp-a12) 0%, rgba(10, 10, 15, 0) 65%);
   animation: pulse-glow 6s ease-in-out infinite alternate;
   pointer-events: none;
   z-index: -1;
@@ -36,7 +36,7 @@
   border: 1px solid var(--glass-border);
   border-radius: var(--r-xl);
   padding: var(--sp-6) var(--sp-5);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), inset 0 0 15px rgba(233, 30, 140, 0.05);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), inset 0 0 15px var(--cp-a05);
   display: flex;
   flex-direction: column;
   gap: var(--sp-5);
@@ -193,19 +193,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 15px rgba(233, 30, 140, 0.3);
+  box-shadow: 0 4px 15px var(--cp-a30);
   transition: all var(--transition-fast);
 }
 
 .login-btn-primary:hover {
   background: #f02598;
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(233, 30, 140, 0.4);
+  box-shadow: 0 6px 20px var(--cp-a40);
 }
 
 .login-btn-primary:active {
   transform: translateY(1px);
-  box-shadow: 0 2px 10px rgba(233, 30, 140, 0.3);
+  box-shadow: 0 2px 10px var(--cp-a30);
 }
 
 .login-btn-secondary {
