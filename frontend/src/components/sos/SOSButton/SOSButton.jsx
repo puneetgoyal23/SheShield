@@ -10,6 +10,7 @@ import React, { useEffect, useState } from 'react';
 import { Shield, MapPin, AlertTriangle, Users, MicOff, RefreshCw, MessageCircle } from 'lucide-react';
 import useSosStore from '../../../stores/sosStore';
 import useNavigationStore from '../../../stores/navigationStore';
+import useContactStore from '../../../stores/contactStore';
 import axiosInstance from '../../../services/api/axiosInstance';
 import './SOSButton.css';
 
@@ -67,7 +68,7 @@ const SOSCountdown = ({ countdown, onCancel, onActivateNow }) => (
 );
 
 /* ── Active SOS Screen (Compact Panel) ── */
-const SOSActiveScreen = ({ onResolve, apiStatus, userPosition, onRetry, contactsAlerted, triggeredAt }) => {
+const SOSActiveScreen = ({ onResolve, apiStatus, userPosition, onRetry, contactsAlerted, triggeredAt, localContacts }) => {
   const [confirmEnd, setConfirmEnd] = useState(false);
   const [elapsed, setElapsed] = useState('00:00');
 
@@ -95,6 +96,25 @@ const SOSActiveScreen = ({ onResolve, apiStatus, userPosition, onRetry, contacts
     return `https://wa.me/${finalPhone}?text=${encodeURIComponent(msg)}`;
   };
 
+  // Determine contacts to display in WhatsApp row:
+  // prefer backend-alerted list; fall back to locally stored contacts
+  const whatsappContacts = contactsAlerted?.length ? contactsAlerted : (localContacts || []);
+
+  // Contact count label: use local contacts count (always accurate), not backend response
+  const contactCount = localContacts?.length ?? 0;
+  const contactLabel = contactCount > 0
+    ? `${contactCount} Configured`
+    : 'None Configured';
+
+  // Location label
+  const locationLabel = userPosition ? 'Ready & Shared' : 'Unavailable';
+
+  // Alert label
+  const alertLabel =
+    apiStatus === 'pending' ? 'Dispatching…' :
+    apiStatus === 'success' ? 'Alert Dispatched' :
+    'Failed to Dispatch';
+
   return (
     <div className="sos-active-panel anim-slide-up" role="alertdialog" aria-modal="true">
       <div className="sos-active-header">
@@ -113,12 +133,12 @@ const SOSActiveScreen = ({ onResolve, apiStatus, userPosition, onRetry, contacts
       <div className="sos-status-list">
         <div className="sos-status-item">
           <MapPin size={16} />
-          <span>Location: {userPosition ? "Ready & Shared" : "Unavailable"}</span>
+          <span>Location: {locationLabel}</span>
         </div>
         
         <div className={`sos-status-item ${apiStatus === 'error' ? 'error' : ''}`}>
           <AlertTriangle size={16} />
-          <span>Alert: {apiStatus === 'pending' ? 'Dispatching...' : apiStatus === 'success' ? 'Dispatched' : 'Failed to Dispatch'}</span>
+          <span>Alert: {alertLabel}</span>
           {apiStatus === 'error' && (
             <button className="sos-retry-btn" onClick={onRetry}><RefreshCw size={14} /></button>
           )}
@@ -126,14 +146,14 @@ const SOSActiveScreen = ({ onResolve, apiStatus, userPosition, onRetry, contacts
 
         <div className="sos-status-item">
           <Users size={16} />
-          <span>Contacts: {apiStatus === 'success' ? (contactsAlerted?.length ? `App Alerts Sent (${contactsAlerted.length})` : 'None Configured') : 'Pending'}</span>
+          <span>Contacts: {contactLabel}</span>
         </div>
 
-        {apiStatus === 'success' && contactsAlerted?.length > 0 && (
+        {whatsappContacts.length > 0 && (
           <div className="sos-whatsapp-section">
             <p className="sos-wa-title">Manual WhatsApp Share:</p>
             <div className="sos-wa-list">
-              {contactsAlerted.map((contact, idx) => (
+              {whatsappContacts.map((contact, idx) => (
                 <a 
                   key={idx}
                   href={getWhatsAppLink(contact)}
@@ -191,8 +211,12 @@ const SOSButton = () => {
     alertContacts,
   } = useSosStore();
 
-  const userPosition = useNavigationStore((s) => s.userPosition);
-  const [apiStatus, setApiStatus] = useState('pending'); // 'pending' | 'success' | 'error'
+  const userPosition  = useNavigationStore((s) => s.userPosition);
+  // Read emergency contacts directly from contactStore so the count
+  // is always accurate regardless of backend response state
+  const localContacts = useContactStore((s) => s.contacts);
+
+  const [apiStatus, setApiStatus] = useState('pending');
 
   const triggerSOS = async () => {
     setApiStatus('pending');
@@ -309,12 +333,13 @@ const SOSButton = () => {
 
       {/* Active SOS compact panel overlay */}
       {isActive && (
-        <SOSActiveScreen 
+        <SOSActiveScreen
           onResolve={handleResolve}
           apiStatus={apiStatus}
           userPosition={userPosition}
           onRetry={triggerSOS}
           contactsAlerted={contactsAlerted}
+          localContacts={localContacts}
           triggeredAt={triggeredAt}
         />
       )}
