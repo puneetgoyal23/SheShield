@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { TriangleAlert, CheckCircle2 } from 'lucide-react';
 import useReportStore from '../../../stores/reportStore';
 import useNavigationStore from '../../../stores/navigationStore';

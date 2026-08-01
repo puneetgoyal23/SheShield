@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shield, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import axiosInstance from '../../../services/api/axiosInstance';
 import useUserStore from '../../../stores/userStore';
 import sheShieldLogo from '../../../assets/sheshield-logo.png';

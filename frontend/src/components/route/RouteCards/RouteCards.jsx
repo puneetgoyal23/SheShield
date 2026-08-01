@@ -4,7 +4,6 @@ import { haversineDistance } from '../../../utils/geoUtils';
 import useRouteStore from '../../../stores/routeStore';
 import useUiStore from '../../../stores/uiStore';
 import useNavigationStore from '../../../stores/navigationStore';
-import useTravelModeStore from '../../../stores/travelModeStore';
 import { APP_MODES, SHEET_STATES } from '../../../constants/appConstants';
 import { ShieldAlert, ShieldCheck, Shield, ChevronDown, ChevronUp, AlertTriangle } from 'lucide-react';
 import axiosInstance from '../../../services/api/axiosInstance';
@@ -130,8 +129,7 @@ const RouteCards = () => {
   const userPosition = useNavigationStore((s) => s.userPosition);
 
   // Travel mode (now fetched natively by API, multiplier no longer needed)
-  const getMultiplier = useTravelModeStore((s) => s.getMultiplier);
-  
+    
   const [expandedIndex, setExpandedIndex] = useState(0);
   const [showPickupModal, setShowPickupModal] = useState(false);
 

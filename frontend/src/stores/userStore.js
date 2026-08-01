@@ -22,7 +22,7 @@ const save = (key, value) => {
   }
 };
 
-const useUserStore = create((set, get) => ({
+const useUserStore = create((set) => ({
   /* ── State ── */
   profile:         load(STORAGE_KEYS.USER_PROFILE, null),
   isOnboarded:     !!localStorage.getItem(STORAGE_KEYS.ONBOARDED),

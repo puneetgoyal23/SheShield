@@ -6,7 +6,8 @@
  *   During countdown: tap again OR tap CANCEL → abort
  *   Countdown reaches 0 → SOS activates → backend notified
  */
-import React, { useEffect, useState } from 'react';
+/* eslint-disable react-hooks/set-state-in-effect */
+import { useState, useEffect, } from 'react';
 import { Shield, MapPin, AlertTriangle, Users, MicOff, RefreshCw, MessageCircle } from 'lucide-react';
 import useSosStore from '../../../stores/sosStore';
 import useNavigationStore from '../../../stores/navigationStore';

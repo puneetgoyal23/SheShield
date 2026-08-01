@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, ShieldCheck } from 'lucide-react';
 import './LocationPermissionScreen.css';
@@ -15,11 +15,11 @@ const LocationPermissionScreen = () => {
     }
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      () => {
         // Permission granted
-        navigate('/app/navigation');
+        navigate('/app/home');
       },
-      (error) => {
+      () => {
         // Permission denied or error
         setErrorMsg('Location permission is required for safe routing.');
       },
@@ -32,7 +32,7 @@ const LocationPermissionScreen = () => {
   };
 
   const handleSkip = () => {
-    navigate('/app/navigation');
+    navigate('/app/home');
   };
 
   return (

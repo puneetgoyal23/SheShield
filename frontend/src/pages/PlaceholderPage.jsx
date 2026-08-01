@@ -3,7 +3,7 @@
  * Displays the page title and a "coming soon" message.
  * Replace this component with real content in future phases.
  */
-import React from 'react';
+
 import './PlaceholderPage.css';
 
 const PlaceholderPage = ({ icon: Icon, title, iconColor }) => (

@@ -2,13 +2,13 @@
  * SafetyHubPage — Emergency actions, nearby resources, safety tips.
  * Pure UI — dummy data only. No backend calls.
  */
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Shield, Phone, MapPin, Share2, AlertTriangle,
-  Navigation, Lightbulb, ChevronRight, Radio,
+  Navigation, ChevronRight,
   Building2, Cross, Siren, Users, Lock, Bell,
-  ShieldCheck, Zap
+  ShieldCheck
 } from 'lucide-react';
 import useSosStore from '../stores/sosStore';
 import './SafetyHubPage.css';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { TriangleAlert } from 'lucide-react';
 import useReportStore from '../../../stores/reportStore';
 import './ReportButton.css';

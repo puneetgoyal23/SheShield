@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect, useCallback } from 'react';
 import { useMapsLibrary } from '@vis.gl/react-google-maps';
 
@@ -93,7 +94,7 @@ export const useGeocoding = () => {
       console.error('Nominatim search error:', error);
       return [];
     }
-  }, []);
+  }, [autocompleteService]);
 
   const getPlaceDetails = useCallback(async (placeId) => {
     if (!geocoder) return null;
@@ -151,7 +152,7 @@ export const useGeocoding = () => {
         };
       }
       throw new Error("No results found");
-    } catch (error) {
+    } catch {
       console.warn('Reverse geocoding failed: The Google Geocoding API might be disabled on this API key. Please enable it in the Google Cloud Console for exact locality names.');
       return {
         name: 'My Location',

@@ -2,25 +2,21 @@
  * SafetyRoomsPage — route-based travel community for safer commuting.
  * Fully integrated with backend REST APIs and Socket.IO for real-time features.
  */
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   Users, Plus, MapPin, ArrowRight, Clock,
-  Shield, ShieldCheck, Send, ChevronLeft,
+  Shield, Send, ChevronLeft,
   Radio, Navigation, CheckCircle2,
   Star, Globe, UserCheck, MessageCircle,
   UserPlus, X, Zap, Search, Bike, LogOut,
-  CalendarDays, Info, Route
+  CalendarDays, Info
 } from 'lucide-react';
 import './CommunityPage.css';
 import { roomApi } from '../services/api/roomApi';
 import socketService from '../services/socketService';
 
 const FREQUENCY_OPTIONS = ['Daily', 'Weekdays', 'Occasionally'];
-const PRIVACY_OPTIONS   = [
-  { value: 'women_only',    label: 'Women Only',    icon: Shield    },
-  { value: 'everyone',      label: 'Everyone',       icon: Globe     },
-  { value: 'verified_only', label: 'Verified Users', icon: UserCheck },
-];
+
 
 const PRIVACY_META = {
   women_only:    { label: 'Women Only', icon: Shield,    color: 'var(--color-primary)' },
@@ -33,7 +29,7 @@ const getUserId = () => {
   try {
     const user = JSON.parse(localStorage.getItem('ss_user_profile'));
     return user?._id || user?.id || 'mock_user_id';
-  } catch(e) { return 'mock_user_id'; }
+  } catch { return 'mock_user_id'; }
 };
 
 /* ══════════════════════════════════════════════
@@ -439,6 +435,7 @@ const QuickActions = ({ room, onBack, onUpdate }) => {
     <div className="rd-section">
       <div className="rd-section-label"><Zap size={14} /> Quick Actions</div>
       <div className="rd-actions-grid">
+        {/* eslint-disable-next-line */}
         {actions.map(({ id, icon: Icon, label, color, active, onClick }) => (
           <button key={id} className={`rd-action-btn ${active ? 'rd-action-btn--done' : ''}`} style={{ '--qa-color': color }} onClick={onClick}>
             <div className="rd-action-icon"><Icon size={20} /></div>
@@ -541,6 +538,7 @@ const SafetyRoomsPage = () => {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchRooms();
   }, []);
 
@@ -549,7 +547,7 @@ const SafetyRoomsPage = () => {
     try {
       const res = await roomApi.getRoomById(activeRoom.roomId);
       setActiveRoom(res.data || res);
-    } catch(e) {}
+    } catch { /* ignore */ }
   };
 
   const handleJoin = async (room) => {

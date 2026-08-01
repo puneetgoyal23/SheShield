@@ -5,7 +5,7 @@
 import { create } from 'zustand';
 import { APP_MODES, SHEET_STATES } from '../constants/appConstants';
 
-const useUiStore = create((set, get) => ({
+const useUiStore = create((set) => ({
   /* ── State ── */
   appMode:          APP_MODES.IDLE,
   bottomSheetState: SHEET_STATES.PEEK,

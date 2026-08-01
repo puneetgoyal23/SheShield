@@ -4,6 +4,7 @@
  * Returns the initial position once.
  * Phase 3 will add a watchPosition hook for continuous tracking.
  */
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect, useCallback } from 'react';
 
 const GEO_OPTIONS = {

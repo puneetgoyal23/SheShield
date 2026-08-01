@@ -1,5 +1,4 @@
-import React from 'react';
-import { AlertTriangle, ShieldAlert } from 'lucide-react';
+import { AlertTriangle, } from 'lucide-react';
 import useAlertStore from '../../../stores/alertStore';
 import useSosStore from '../../../stores/sosStore';
 import SafePointSuggestions from '../../safety/SafePointSuggestions/SafePointSuggestions';

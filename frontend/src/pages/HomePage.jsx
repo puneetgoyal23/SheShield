@@ -1,15 +1,17 @@
 /**
- * HomePage — SheShield Home Dashboard
+ * HomePage — SheShield Premium Dashboard
  *
- * A polished mobile-first safety dashboard.
- * Uses only existing design tokens & stores — no new backend logic.
+ * Design: Apple × Linear × modern fintech.
+ * Sections:
+ *   Hero → Timeline → Features → Stats Bar → Quick Actions → Bottom CTA
  */
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  MapPin, Shield, Navigation, AlertTriangle,
-  Phone, ShieldCheck, Lightbulb, ChevronRight,
-  Building2, Cross, Users, Flame, Clock, TriangleAlert
+  MapPin, Navigation, ShieldCheck, Users,
+  Siren, ChevronRight, ArrowRight,
+  Building2, UserCircle2, Compass,
+  CheckCircle, Star, Zap,
 } from 'lucide-react';
 import useUserStore       from '../stores/userStore';
 import useNavigationStore from '../stores/navigationStore';
@@ -17,291 +19,257 @@ import useContactStore    from '../stores/contactStore';
 import useSosStore        from '../stores/sosStore';
 import './HomePage.css';
 
-/* ═══════════════════════════════════════
-   Helpers
-   ═══════════════════════════════════════ */
+/* ── helpers ── */
 const getGreeting = () => {
   const h = new Date().getHours();
+  if (h < 5)  return 'Good Night';
   if (h < 12) return 'Good Morning';
   if (h < 17) return 'Good Afternoon';
   return 'Good Evening';
 };
 
-/* ═══════════════════════════════════════
-   Static dummy data (no backend calls)
-   ═══════════════════════════════════════ */
-const NEARBY_PLACES = [
-  { id: 1, icon: Building2, label: 'Police Station', distance: '0.4 km', color: '#42a5f5' },
-  { id: 2, icon: Cross,     label: 'Hospital',       distance: '0.8 km', color: '#ef5350' },
-  { id: 3, icon: Shield,    label: "Women's Help",   distance: '1.2 km', color: '#ec407a' },
-  { id: 4, icon: Flame,     label: 'Fire Station',   distance: '1.6 km', color: '#ffa726' },
+/* ── timeline data ── */
+const TIMELINE = [
+  { id: 1, icon: Compass,      title: 'Choose Destination',      desc: 'Tell us where you want to go.' },
+  { id: 2, icon: Zap,          title: 'AI Analyses Every Route',  desc: 'Real-time safety signals from the community.' },
+  { id: 3, icon: Star,         title: 'SafeScore Generated',       desc: 'Every route gets a live safety rating.' },
+  { id: 4, icon: Users,        title: 'Community Insights Added',  desc: 'Reports and room data refine the score.' },
+  { id: 5, icon: CheckCircle,  title: 'Reach Safely',             desc: 'Trusted contacts track you until you arrive.' },
 ];
 
-const COMMUNITY_ALERTS = [
+/* ── feature rows ── */
+const FEATURES = [
   {
-    id: 1,
-    icon: Lightbulb,
-    type: 'Poor Lighting',
-    location: 'Sector 44',
-    time: '12 min ago',
-    severity: 'caution',
+    id: 'routes',
+    emoji: '🛡',
+    title: 'AI Safe Routes',
+    desc: 'Choose routes based on safety—not just speed. Every path is scored before you travel.',
   },
   {
-    id: 2,
-    icon: TriangleAlert,
-    type: 'Suspicious Activity',
-    location: 'Nearby Area',
-    time: '38 min ago',
-    severity: 'danger',
+    id: 'location',
+    emoji: '📍',
+    title: 'Live Location Sharing',
+    desc: 'Trusted contacts follow your entire journey in real time until you arrive.',
   },
   {
-    id: 3,
-    icon: Users,
-    type: 'Safe Crowd Reported',
-    location: 'DLF Cyber City',
-    time: '1 hr ago',
-    severity: 'safe',
+    id: 'rooms',
+    emoji: '👥',
+    title: 'Safety Rooms',
+    desc: 'Travel in sync with others on the same route. Safer together.',
+  },
+  {
+    id: 'sos',
+    emoji: '🚨',
+    title: 'Emergency SOS',
+    desc: 'One tap instantly alerts all your emergency contacts with your live location.',
   },
 ];
 
-const SAFETY_TIP = 'Always share your live location with a trusted contact during night travel.';
+/* ── quick action buttons ── */
+const QUICK = [
+  { id: 'nav',     Icon: Navigation,  label: 'Start Navigation', path: '/app/navigation', accent: 'theme' },
+  { id: 'rooms',   Icon: Users,       label: 'Safety Rooms',      path: '/app/community',  accent: 'theme' },
+  { id: 'sos',     Icon: Siren,       label: 'Emergency SOS',     path: null,              accent: 'sos'   },
+  { id: 'help',    Icon: Building2,   label: 'Nearby Help',       path: '/app/safety',     accent: 'theme' },
+  { id: 'profile', Icon: UserCircle2, label: 'Profile',           path: '/app/profile',    accent: 'muted' },
+];
 
-/* ═══════════════════════════════════════
-   Sub-components
-   ═══════════════════════════════════════ */
-
-/** Section header shared across all sections */
-const SectionHeader = ({ title, action, onAction }) => (
-  <div className="hd-section-header">
-    <h2 className="hd-section-title">{title}</h2>
-    {action && (
-      <button className="hd-section-link" onClick={onAction}>
-        {action} <ChevronRight size={14} />
-      </button>
-    )}
-  </div>
-);
-
-/** Top greeting header */
-const DashboardHeader = ({ userName, userPosition }) => (
-  <header className="hd-header anim-slide-down">
-    <div className="hd-header-text">
-      <p className="hd-greeting">{getGreeting()}</p>
-      <h1 className="hd-user-name">{userName || 'Stay Safe'} <span className="hd-wave">👋</span></h1>
-    </div>
-    <div className="hd-location-pill">
-      <span
-        className="hd-location-pulse"
-        style={{ background: userPosition ? 'var(--color-safe)' : 'var(--color-text-muted)' }}
-      />
-      <MapPin size={12} className="hd-location-icon" />
-      <span className="hd-location-text">
-        {userPosition ? 'Location Active' : 'Locating…'}
-      </span>
-    </div>
-  </header>
-);
-
-/** Safety Score card — hero card */
-const SafetyScoreCard = () => (
-  <div className="hd-score-card anim-scale-in-spring">
-    {/* Decorative background glows — absolute, not in grid flow */}
-    <div className="hd-score-glow hd-score-glow--pink" aria-hidden="true" />
-    <div className="hd-score-glow hd-score-glow--green" aria-hidden="true" />
-
-    {/* Grid content wrapper — keeps glows out of column calculation */}
-    <div className="hd-score-content">
-
-      {/* Left — Shield icon */}
-      <div className="hd-score-shield-col">
-        <div className="hd-score-shield-ring">
-          <div className="hd-score-shield-inner">
-            <Shield className="hd-score-shield-icon" />
-          </div>
-        </div>
-      </div>
-
-      {/* Center — labels */}
-      <div className="hd-score-middle">
-        <span className="hd-score-eyebrow">Safety Status</span>
-        <p className="hd-score-status">Generally Safe</p>
-        <p className="hd-score-desc">
-          Based on nearby reports &amp; safe locations.
-        </p>
-      </div>
-
-      {/* Right — score number */}
-      <div className="hd-score-right">
-        <div className="hd-score-number-wrap">
-          <span className="hd-score-number">94</span>
-          <span className="hd-score-denom">/100</span>
-        </div>
-      </div>
-
-    </div>
-  </div>
-);
-
-/** Quick action buttons */
-const QuickActions = ({ onNavigate, onSOS }) => (
-  <div className="hd-quick-actions anim-fade-in">
-    <button
-      id="hd-btn-navigation"
-      className="hd-action-btn hd-action-btn--primary"
-      onClick={onNavigate}
-    >
-      <div className="hd-action-icon-wrap hd-action-icon-wrap--primary">
-        <Navigation size={20} />
-      </div>
-      <span className="hd-action-btn-text">
-        <strong>Start Navigation</strong>
-        <small>Plan your safest route</small>
-      </span>
-    </button>
-
-    <button
-      id="hd-btn-sos"
-      className="hd-action-btn hd-action-btn--danger"
-      onClick={onSOS}
-    >
-      <div className="hd-action-icon-wrap hd-action-icon-wrap--danger">
-        <AlertTriangle size={20} />
-      </div>
-      <span className="hd-action-btn-text">
-        <strong>Emergency SOS</strong>
-        <small>Alert your contacts</small>
-      </span>
-    </button>
-  </div>
-);
-
-/** Nearby safe places horizontal scroll */
-const NearbyPlaces = () => (
-  <section className="hd-section">
-    <SectionHeader title="Nearby Safe Places" />
-    <div className="hd-places-scroll">
-      {NEARBY_PLACES.map(({ id, icon: Icon, label, distance, color }) => (
-        <div key={id} className="hd-place-card">
-          <div className="hd-place-icon-wrap" style={{ '--place-color': color }}>
-            <Icon size={20} />
-          </div>
-          <p className="hd-place-label">{label}</p>
-          <p className="hd-place-dist">{distance}</p>
-        </div>
-      ))}
-    </div>
-  </section>
-);
-
-/** Community alerts preview */
-const CommunityAlerts = ({ onViewCommunity }) => (
-  <section className="hd-section">
-    <SectionHeader title="Community Alerts" action="View All" onAction={onViewCommunity} />
-    <div className="hd-alerts-list">
-      {COMMUNITY_ALERTS.map(({ id, icon: Icon, type, location, time, severity }) => (
-        <div key={id} className={`hd-alert-card hd-alert-card--${severity}`}>
-          <div className={`hd-alert-icon-wrap hd-alert-icon--${severity}`}>
-            <Icon size={17} />
-          </div>
-          <div className="hd-alert-body">
-            <p className="hd-alert-type">{type}</p>
-            <p className="hd-alert-location">
-              <MapPin size={10} /> {location}
-            </p>
-          </div>
-          <span className="hd-alert-time">
-            <Clock size={10} /> {time}
-          </span>
-        </div>
-      ))}
-    </div>
-  </section>
-);
-
-/** Emergency contacts mini card */
-const EmergencyContactsCard = ({ contactCount, onManage }) => (
-  <div className="hd-contacts-card anim-fade-in">
-    <div className="hd-contacts-left">
-      <div className="hd-contacts-icon-wrap">
-        <Phone size={19} />
-      </div>
-      <div>
-        <p className="hd-contacts-title">Emergency Contacts</p>
-        <p className="hd-contacts-sub">
-          {contactCount > 0
-            ? `${contactCount} trusted contact${contactCount !== 1 ? 's' : ''} added`
-            : 'No contacts added yet'}
-        </p>
-      </div>
-    </div>
-    <button className="hd-contacts-manage-btn" onClick={onManage}>
-      Manage
-    </button>
-  </div>
-);
-
-/** Safety tip footer card */
-const SafetyTipCard = () => (
-  <div className="hd-tip-card anim-fade-in">
-    <div className="hd-tip-icon-wrap">
-      <ShieldCheck size={17} />
-    </div>
-    <p className="hd-tip-text">
-      <strong>Safety Tip: </strong>{SAFETY_TIP}
-    </p>
-  </div>
-);
-
-/* ═══════════════════════════════════════
-   Main Page
-   ═══════════════════════════════════════ */
+/* ══════════════════════════════════════════════
+   MAIN PAGE
+   ══════════════════════════════════════════════ */
 const HomePage = () => {
-  const navigate       = useNavigate();
-  const profile        = useUserStore((s) => s.profile);
-  const userPosition   = useNavigationStore((s) => s.userPosition);
-  const contacts       = useContactStore((s) => s.contacts);
-  const beginCountdown = useSosStore((s) => s.beginCountdown);
+  const navigate        = useNavigate();
+  const profile         = useUserStore((s) => s.profile);
+  const userPosition    = useNavigationStore((s) => s.userPosition);
+  const contacts        = useContactStore((s) => s.contacts);
+  const beginCountdown  = useSosStore((s) => s.beginCountdown);
 
   const userName = useMemo(() => {
     const raw = profile?.name || profile?.email?.split('@')[0] || null;
     return raw ? raw.charAt(0).toUpperCase() + raw.slice(1) : null;
   }, [profile]);
 
-  const handleNavigate      = () => navigate('/app/navigation');
-  const handleSOS           = () => { navigate('/app/navigation'); setTimeout(() => beginCountdown(), 100); };
-  const handleViewCommunity = () => navigate('/app/community');
-  const handleManageContacts = () => navigate('/app/profile');
+  const go    = (path) => navigate(path);
+  const goSOS = () => { navigate('/app/navigation'); setTimeout(() => beginCountdown(), 120); };
 
   return (
-    <div className="hd-page">
-      <div className="hd-scroll-container">
+    <div className="hp-page">
+      <div className="hp-scroll">
 
-        {/* 1. Header */}
-        <DashboardHeader userName={userName} userPosition={userPosition} />
+        {/* ══ SECTION 1: HERO ══ */}
+        <section className="hp-hero">
+          <div className="hp-hero-ambient" aria-hidden="true" />
 
-        {/* 2. Safety Score Hero */}
-        <SafetyScoreCard />
+          {/* location chip */}
+          <div className="hp-loc-chip">
+            <span
+              className="hp-loc-dot"
+              style={{ background: userPosition ? 'var(--color-safe)' : 'var(--color-text-muted)' }}
+            />
+            <MapPin size={11} />
+            <span>{userPosition ? 'Location Active' : 'Locating…'}</span>
+          </div>
 
-        {/* 3. Quick Actions */}
-        <QuickActions onNavigate={handleNavigate} onSOS={handleSOS} />
+          {/* greeting */}
+          <p className="hp-greeting">
+            {getGreeting()}, <span className="hp-greeting-name">{userName || 'Stay Safe'}</span> 👋
+          </p>
 
-        {/* 4. Nearby Places */}
-        <NearbyPlaces />
+          {/* headline */}
+          <h1 className="hp-headline">
+            Navigate Smarter.<br />
+            <span className="hp-headline-accent">Navigate Safer.</span>
+          </h1>
 
-        {/* 5. Community Alerts */}
-        <CommunityAlerts onViewCommunity={handleViewCommunity} />
+          {/* sub */}
+          <p className="hp-sub">
+            AI-powered navigation that helps women choose safer routes using
+            community reports, SafeScore and live protection.
+          </p>
 
-        {/* 6. Emergency Contacts */}
-        <section className="hd-section">
-          <EmergencyContactsCard
-            contactCount={contacts.length}
-            onManage={handleManageContacts}
-          />
+          {/* CTAs */}
+          <div className="hp-cta-group">
+            <button
+              id="hp-btn-nav"
+              className="hp-cta-primary"
+              onClick={() => go('/app/navigation')}
+            >
+              <Navigation size={18} />
+              Start Safe Navigation
+              <ArrowRight size={16} className="hp-cta-arrow" />
+            </button>
+            <button
+              id="hp-btn-rooms"
+              className="hp-cta-outline"
+              onClick={() => go('/app/community')}
+            >
+              <Users size={15} />
+              Join Safety Rooms
+            </button>
+          </div>
         </section>
 
-        {/* 7. Safety Tip */}
-        <section className="hd-section hd-section--last">
-          <SafetyTipCard />
+        {/* ══ SECTION 2: HOW IT WORKS — TIMELINE ══ */}
+        <section className="hp-section">
+          <p className="hp-eyebrow">The Process</p>
+          <h2 className="hp-section-title">How SheShield Protects You</h2>
+
+          <div className="hp-timeline">
+            {TIMELINE.map(({ id, icon: Icon, title, desc }, i) => (
+              <div key={id} className="hp-step">
+                {/* connector line */}
+                {i < TIMELINE.length - 1 && <div className="hp-step-line" aria-hidden="true" />}
+
+                <div className="hp-step-left">
+                  <div className="hp-step-icon">
+                    <Icon size={16} />
+                  </div>
+                </div>
+
+                <div className="hp-step-body">
+                  <p className="hp-step-num">0{id}</p>
+                  <h3 className="hp-step-title">{title}</h3>
+                  <p className="hp-step-desc">{desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ══ SECTION 3: FEATURES ══ */}
+        <section className="hp-section">
+          <p className="hp-eyebrow">Built for Safety</p>
+          <h2 className="hp-section-title">Safety Features</h2>
+
+          <div className="hp-features">
+            {FEATURES.map(({ id, emoji, title, desc }, i) => (
+              <div key={id} className={`hp-feature-row ${i % 2 === 1 ? 'hp-feature-row--alt' : ''}`}>
+                <div className="hp-feature-emoji" aria-hidden="true">{emoji}</div>
+                <div className="hp-feature-body">
+                  <h3 className="hp-feature-title">{title}</h3>
+                  <p className="hp-feature-desc">{desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ══ SECTION 4: QUICK STATS BAR ══ */}
+        <section className="hp-section">
+          <p className="hp-eyebrow">Right Now</p>
+          <h2 className="hp-section-title">Today's Overview</h2>
+
+          <div className="hp-stats-bar">
+            <div className="hp-stat-chip">
+              <span className="hp-stat-num hp-stat-num--safe">94</span>
+              <span className="hp-stat-lbl">SafeScore</span>
+            </div>
+            <div className="hp-stat-divider" aria-hidden="true" />
+            <div className="hp-stat-chip">
+              <span className="hp-stat-num hp-stat-num--caution">3</span>
+              <span className="hp-stat-lbl">Reports Nearby</span>
+            </div>
+            <div className="hp-stat-divider" aria-hidden="true" />
+            <div className="hp-stat-chip">
+              <span className="hp-stat-num hp-stat-num--info">1</span>
+              <span className="hp-stat-lbl">Police Station</span>
+            </div>
+            <div className="hp-stat-divider" aria-hidden="true" />
+            <div className="hp-stat-chip">
+              <span className="hp-stat-num hp-stat-num--theme">6</span>
+              <span className="hp-stat-lbl">Safety Rooms</span>
+            </div>
+          </div>
+
+          {/* contacts badge */}
+          {contacts.length > 0 && (
+            <div className="hp-contacts-badge">
+              <ShieldCheck size={14} />
+              <span>
+                {contacts.length} emergency contact{contacts.length !== 1 ? 's' : ''} ready
+              </span>
+            </div>
+          )}
+        </section>
+
+        {/* ══ SECTION 5: QUICK ACTIONS ══ */}
+        <section className="hp-section">
+          <p className="hp-eyebrow">Navigate</p>
+          <h2 className="hp-section-title">Quick Actions</h2>
+
+          <div className="hp-actions">
+            {QUICK.map(({ id, Icon, label, path, accent }) => (
+              <button
+                key={id}
+                id={`hp-action-${id}`}
+                className={`hp-action-btn hp-action-btn--${accent}`}
+                onClick={() => (id === 'sos' ? goSOS() : go(path))}
+              >
+                <span className={`hp-action-icon hp-action-icon--${accent}`}>
+                  <Icon size={18} />
+                </span>
+                <span className="hp-action-label">{label}</span>
+                <ChevronRight size={14} className="hp-action-arrow" />
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* ══ SECTION 6: BOTTOM CTA ══ */}
+        <section className="hp-bottom-cta">
+          <div className="hp-bottom-cta-glow" aria-hidden="true" />
+          <p className="hp-bottom-eyebrow">You're protected.</p>
+          <h2 className="hp-bottom-title">Ready to travel safely?</h2>
+          <button
+            id="hp-bottom-nav-btn"
+            className="hp-cta-primary hp-cta-primary--full"
+            onClick={() => go('/app/navigation')}
+          >
+            <Navigation size={18} />
+            Start Navigation
+            <ArrowRight size={16} className="hp-cta-arrow" />
+          </button>
+          <p className="hp-bottom-hint">Your journey begins with a safer route.</p>
         </section>
 
       </div>

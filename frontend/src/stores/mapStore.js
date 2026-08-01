@@ -6,7 +6,7 @@
  * to trigger map movements without prop drilling.
  */
 import { create } from 'zustand';
-import { DEFAULT_CENTER, DEFAULT_ZOOM, FLY_DURATION_SECONDS } from '../constants/mapConstants';
+import { DEFAULT_CENTER, DEFAULT_ZOOM } from '../constants/mapConstants';
 
 const useMapStore = create((set, get) => ({
   /* ── State ── */

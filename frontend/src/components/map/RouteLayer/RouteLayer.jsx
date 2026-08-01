@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useRef } from 'react';
 import { useMap } from '@vis.gl/react-google-maps';
 import useRouteStore from '../../../stores/routeStore';
@@ -86,7 +87,7 @@ const RouteLayer = () => {
       setError(null);
       
       try {
-        const apiTravelMode = travelMode === 'bike' ? 'BICYCLE' : travelMode === 'car' ? 'DRIVE' : 'WALK';
+        const apiTravelMode = travelMode === 'bike' ? 'TWO_WHEELER' : travelMode === 'car' ? 'DRIVE' : 'WALK';
         const fetchedRoutes = await routingApi.getSafeRoutes(origin, destination, apiTravelMode);
         setRoutes(fetchedRoutes);
         

@@ -17,8 +17,8 @@
   justify-content: center;
 
   box-shadow:
-    0 4px 24px rgba(255, 23, 68, 0.55),
-    0 1px 4px rgba(0, 0, 0, 0.5);
+    0 6px 28px rgba(255, 23, 68, 0.65),
+    0 2px 8px rgba(0, 0, 0, 0.4);
 
   animation: sos-pulse 2.2s ease-in-out infinite;
   transition: transform var(--transition-fast), opacity var(--transition-fast);
@@ -32,7 +32,7 @@
 }
 
 .sos-fab:active {
-  transform: scale(0.94);
+  transform: scale(0.92);
 }
 
 .sos-fab.counting {

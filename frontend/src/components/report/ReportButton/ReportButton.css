@@ -3,19 +3,19 @@
   align-items: center;
   justify-content: center;
   gap: var(--sp-2);
-  width: 40px;
+  width: 38px;
   padding: 0;
-  height: 40px;
-  background: var(--glass-bg-heavy);
+  height: 38px;
+  background: var(--glass-bg-light);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border-strong);
+  border: 1px solid var(--glass-border);
   border-radius: var(--r-full);
   color: var(--color-text-primary);
   font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
+  font-weight: var(--weight-medium);
   cursor: pointer;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
   transition: all var(--transition-base);
   animation: scale-in-spring 0.4s both;
 }
@@ -44,8 +44,8 @@
 @media (min-width: 768px) {
   .report-incident-btn {
     width: auto;
-    padding: 0 16px;
-    height: 44px;
+    padding: 0 14px;
+    height: 38px;
   }
   .report-label {
     display: block;

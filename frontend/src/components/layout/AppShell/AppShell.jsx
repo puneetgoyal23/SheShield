@@ -6,7 +6,6 @@
  *
  * This component is intentionally thin — no business logic.
  */
-import React from 'react';
 import { Outlet } from 'react-router-dom';
 import BottomNavBar from '../BottomNavBar/BottomNavBar';
 import './AppShell.css';

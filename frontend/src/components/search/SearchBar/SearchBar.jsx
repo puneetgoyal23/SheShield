@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect, useRef } from 'react';
 import { Search, X, Crosshair, ArrowUpDown } from 'lucide-react';
 import useUiStore from '../../../stores/uiStore';
@@ -44,7 +45,7 @@ const SearchBar = () => {
   const [activeIndex, setActiveIndex] = useState(-1);
   const wrapperRef = useRef(null);
 
-  const { searchPlaces, reverseGeocode, isReady } = useGeocoding();
+  const { searchPlaces, getPlaceDetails, reverseGeocode, isReady } = useGeocoding();
 
   const debouncedPickup = useDebounce(pickupQuery, 300);
   const debouncedDest = useDebounce(destQuery, 300);

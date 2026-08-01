@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import axiosInstance from '../services/api/axiosInstance';
 
-const useContactStore = create((set, get) => ({
+const useContactStore = create((set) => ({
   contacts: [],
   isLoading: false,
   error: null,

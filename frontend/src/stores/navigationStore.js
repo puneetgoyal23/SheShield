@@ -4,7 +4,7 @@
  */
 import { create } from 'zustand';
 
-const useNavigationStore = create((set, get) => ({
+const useNavigationStore = create((set) => ({
   /* ── State ── */
   userPosition:      null,   /* [lat, lng] | null       */
   heading:           0,      /* compass degrees          */

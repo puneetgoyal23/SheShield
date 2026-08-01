@@ -1,6 +1,6 @@
-import React, { useMemo, useCallback, useState, useEffect } from 'react';
-import { AdvancedMarker, InfoWindow, useMap } from '@vis.gl/react-google-maps';
-import { Shield, Navigation, X } from 'lucide-react';
+import React, { useMemo, useCallback, useState } from 'react';
+import { AdvancedMarker, InfoWindow, } from '@vis.gl/react-google-maps';
+import { Navigation, X } from 'lucide-react';
 import useSafetyStore from '../../../stores/safetyStore';
 import useRouteStore from '../../../stores/routeStore';
 import useNavigationStore from '../../../stores/navigationStore';
@@ -20,8 +20,7 @@ const icons = {
 };
 
 const SafePointsLayer = () => {
-  const map = useMap();
-  const safePoints = useSafetyStore((s) => s.safePoints);
+    const safePoints = useSafetyStore((s) => s.safePoints);
   const isSafePointsVisible = useSafetyStore((s) => s.isSafePointsVisible);
   const activeFilter = useSafetyStore((s) => s.activeFilter);
 
@@ -125,8 +124,8 @@ const SafePointsLayer = () => {
 
   return (
     <>
-      {filteredPoints.map((point) => (
-        <React.Fragment key={point.id}>
+      {filteredPoints.map((point, index) => (
+        <React.Fragment key={point.place_id || `${point.lat}-${point.lng}-${index}`}>
           <AdvancedMarker
             position={{ lat: point.lat, lng: point.lng }}
             onClick={() => {

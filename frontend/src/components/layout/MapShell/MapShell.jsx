@@ -8,7 +8,7 @@
  *   3. Remains a pure layout component — no business logic here.
  */
 import { useEffect } from 'react';
-import { Shield } from 'lucide-react';
+import { } from 'lucide-react';
 import { haversineDistance } from '../../../utils/geoUtils';
 
 import MapContainer    from '../../map/MapContainer/MapContainer';
@@ -164,12 +164,6 @@ const MapShell = () => {
       {/* ── Layer 1: Top floating controls (z-index: 100) ── */}
       <div className="layer layer--top" aria-label="Search">
         <div className="top-controls-wrap">
-          {/* App brand */}
-          <div className="app-brand" aria-label="SheShield">
-            <Shield size={24} className="app-brand-icon" style={{ color: 'var(--color-primary)' }} />
-            <span className="app-brand-name">SheShield</span>
-          </div>
-
           {/* Search */}
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <SearchBar />

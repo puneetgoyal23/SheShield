@@ -3,16 +3,16 @@
    ══════════════════════════════════════ */
 
 .live-reports-feed {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--r-xl);
-  padding: 4px 8px;
+  background: var(--glass-bg-heavy);
+  backdrop-filter: var(--glass-blur-heavy);
+  -webkit-backdrop-filter: var(--glass-blur-heavy);
+  border: 1px solid var(--glass-border-strong);
+  border-radius: var(--r-2xl);
+  padding: 6px 10px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  box-shadow: var(--shadow-sm);
+  gap: 4px;
+  box-shadow: var(--shadow-md);
   animation: fade-in-down var(--transition-base) forwards;
 }
 
@@ -55,12 +55,12 @@
 }
 
 .live-reports-title {
-  font-size: 11px;
+  font-size: var(--text-sm);
   font-weight: var(--weight-bold);
   color: var(--color-text-primary);
   display: flex;
   align-items: center;
-  gap: var(--sp-1);
+  gap: var(--sp-2);
 }
 
 .live-reports-dot {
@@ -73,8 +73,8 @@
 
 .live-report-item {
   display: flex;
-  gap: 6px;
-  padding: 2px 0;
+  gap: 8px;
+  padding: 4px 0;
 }
 
 .live-report-icon {
@@ -183,9 +183,9 @@
 
 @media (min-width: 768px) {
   .live-reports-feed {
-    padding: var(--sp-2) var(--sp-3);
-    gap: var(--sp-1);
-    box-shadow: var(--shadow-md);
+    padding: var(--sp-3) var(--sp-4);
+    gap: var(--sp-2);
+    box-shadow: var(--shadow-lg);
   }
   .live-reports-title {
     font-size: var(--text-sm);

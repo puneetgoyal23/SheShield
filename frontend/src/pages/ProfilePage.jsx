@@ -3,14 +3,13 @@
  * Reads from userStore and contactStore. No new backend logic.
  * Settings panels: Notifications, Privacy & Safety, Appearance, About.
  */
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  User, Phone, Shield, Bell, Moon, Lock,
+  Phone, Shield, Bell, Moon, Lock,
   LogOut, ChevronRight, Plus, Mail,
-  ShieldCheck, Trash2, MapPin, Info,
-  X, Globe, Palette, ExternalLink, Heart,
-  Radio, Eye, Mic,
+  ShieldCheck, Info,
+  X, ExternalLink, Heart,
 } from 'lucide-react';
 import useUserStore    from '../stores/userStore';
 import useContactStore from '../stores/contactStore';
@@ -32,7 +31,7 @@ const loadPref = (key, fallback) => {
   catch { return fallback; }
 };
 const savePref = (key, val) => {
-  try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch { /* ignore */ }
 };
 
 /* ══════════════════════════════════════════════

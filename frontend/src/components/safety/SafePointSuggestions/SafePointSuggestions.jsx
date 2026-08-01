@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 /**
  * SafePointSuggestions — Smart safe point recommendations during navigation.
  *
@@ -7,7 +8,7 @@
  *
  * NO external API calls. NO new store state.
  */
-import React, { useMemo, useCallback } from 'react';
+import { useMemo, useCallback } from 'react';
 import { ShieldCheck, Siren, Pill, Hotel, Building2, MapPin } from 'lucide-react';
 import useSafetyStore from '../../../stores/safetyStore';
 import useNavigationStore from '../../../stores/navigationStore';

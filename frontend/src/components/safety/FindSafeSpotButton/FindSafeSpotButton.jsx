@@ -1,4 +1,3 @@
-import React from 'react';
 import { ShieldCheck } from 'lucide-react';
 import useSafetyStore from '../../../stores/safetyStore';
 import useUiStore from '../../../stores/uiStore';

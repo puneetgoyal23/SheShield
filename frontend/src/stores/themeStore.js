@@ -38,7 +38,7 @@ const useThemeStore = create((set) => {
     setTheme: (themeId) => {
       if (!VALID_THEMES.has(themeId)) return;
       applyTheme(themeId);
-      try { localStorage.setItem(STORAGE_KEY, themeId); } catch {}
+      try { localStorage.setItem(STORAGE_KEY, themeId); } catch { /* ignore */ }
       set({ theme: themeId });
     },
   };

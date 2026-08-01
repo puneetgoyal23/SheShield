@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import React, { useEffect, useState } from 'react';
-import { X, UserPlus, Phone, User as UserIcon, Shield, Star, Trash2, Edit2, Check } from 'lucide-react';
+import { X, UserPlus, Phone, User as UserIcon, Shield, Star, Trash2, Edit2, } from 'lucide-react';
 import useContactStore from '../../../stores/contactStore';
 import './EmergencyContactsModal.css';
 

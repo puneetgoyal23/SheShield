@@ -2,7 +2,6 @@
  * BottomNavBar — Persistent 5-tab bottom navigation.
  * Matches the existing SheShield dark glassmorphism design language.
  */
-import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Home, Map, Shield, DoorOpen, User } from 'lucide-react';
 import './BottomNavBar.css';

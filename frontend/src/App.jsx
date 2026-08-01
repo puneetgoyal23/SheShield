@@ -2,7 +2,6 @@
  * App — Root component.
  * Sets up routing for Splash, Login, Location Permission, and the multi-page AppShell.
  */
-import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { APIProvider } from '@vis.gl/react-google-maps';
 
@@ -46,8 +45,8 @@ function App() {
               </ProtectedRoute>
             }
           >
-            {/* Default: go to navigation */}
-            <Route index element={<Navigate to="navigation" replace />} />
+            {/* Default: go to home dashboard */}
+            <Route index element={<Navigate to="home" replace />} />
 
             <Route path="navigation" element={<NavigationPage />} />
             <Route path="home"       element={<HomePage />} />
